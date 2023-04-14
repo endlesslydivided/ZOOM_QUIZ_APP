@@ -13,6 +13,7 @@ import { AppModule } from './app.module';
 import { AllExceptionFilter } from './exception/AllException.filter';
 import { ValidationExceptionFactory } from './validation/validation.exceptionFactory';
 import { NestExpressApplication } from '@nestjs/platform-express';
+import {AbortController} from "node-abort-controller";
 
 
 
