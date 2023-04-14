@@ -13,7 +13,6 @@ export class AuthController {
     @Get()
     async redirect(
         @Query() {code,state}:any ,
-        @Req() req:Request,
         @Res() res:Response, 
         @Session() session:ExpressSession & {state:any,verifier:any})
     {
