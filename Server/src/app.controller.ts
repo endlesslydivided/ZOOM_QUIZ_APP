@@ -9,12 +9,13 @@ import { ZoomContextGuard } from './auth/guards/zoomContext.guard';
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
-  @UseGuards(ZoomContextGuard)
   @Get()
   async homeRoute(@Req() req:Request,@Res() res:Response): Promise<void> {
     try
     {
-      res.end();
+      const context = req.header(contextHeader);
+      res.cookie("zoomContext",context,{maxAge: 2147483647 ,httpOnly:true, secure:true, sameSite:"lax"});
+      res.redirect(process.env.REACT_APP_URI + `?context=${context}`);
     } 
     catch (e) 
     {

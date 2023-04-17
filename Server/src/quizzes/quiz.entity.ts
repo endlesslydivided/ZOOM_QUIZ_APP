@@ -1,6 +1,6 @@
 import { Answer } from 'src/answers/answer.entity';
 import { Report } from 'src/reports/report.entity';
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany, JoinColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany, JoinColumn, Relation, JoinTable, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 
 @Entity({name:'quiz'})
 export class Quiz {
@@ -15,18 +15,20 @@ export class Quiz {
   text: string;
 
   @OneToMany(() => Report,(report) => report.quiz, {
-    eager: true,
-    nullable:true
+    nullable:true,
+    createForeignKeyConstraints: true
     })
-  @JoinColumn() 
   reports: Report[];
 
   @OneToMany(() => Answer,(answer) => answer.quiz, {
-    eager: true,
+    createForeignKeyConstraints: true
     })
-  @JoinColumn() 
   answers: Answer[];
 
+  @CreateDateColumn({name: 'createdAt'})
+  createdAt: Date;
 
+  @UpdateDateColumn({name: 'updatedAt'})
+  updatedAt: Date;
 
 }

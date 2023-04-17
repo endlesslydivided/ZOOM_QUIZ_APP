@@ -1,0 +1,20 @@
+.quiz-page-container
+{
+    display:grid;
+    margin: 15px 0px;
+
+    .ant-row.quiz-row
+    {
+        width: 75vw;
+        justify-self:center;
+
+        .quiz-postlist-col
+        {
+            .ant-space
+            {
+                width: 100%;
+                justify-self:center;
+            }
+        }
+    }
+}

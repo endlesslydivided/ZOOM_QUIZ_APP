@@ -1,24 +1,21 @@
-import { notification } from "antd";
-import {apiSlice} from "./ApiSlice";
+import { apiSlice } from "./ApiSlice";
 
 
 export const QuizzesApiSlice = apiSlice.injectEndpoints({
     endpoints: builder => ({
-        signIn: builder.mutation({
-            query: (credentials) => ({
-                url: '/auth/signIn',
+        createQuiz: builder.mutation({
+            query: ({body}) => ({
+                url: '/quizzes',
                 method: 'POST',
-                body: {...credentials}
+                body: body
             }),
         }),
-        signUp: builder.mutation({
-            query: (data) => (
-                {
-                    url: '/auth/signUp',
-                    method: 'POST',
-                    body: data
-                }
-            )
+
+        getUserQuizzes: builder.query({
+            query: () => ({
+                url: '/quizzes',
+                method: 'GET'
+            }),
         }),
        
     })
@@ -26,6 +23,6 @@ export const QuizzesApiSlice = apiSlice.injectEndpoints({
 
 
 export const {
-    useSignInMutation,
-    useSignUpMutation,
+    useCreateQuizMutation,
+    useGetUserQuizzesQuery
 } = QuizzesApiSlice;

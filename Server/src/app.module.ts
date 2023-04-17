@@ -15,6 +15,8 @@ import { Answer } from './answers/answer.entity';
 import { ResultsModule } from './results/results.module';
 import { Result } from './results/result.entity';
 import { Report } from './reports/report.entity';
+import { PlaySessionsModule } from './play-sessions/play-sessions.module';
+import { PlaySession } from './play-sessions/playSession.entity';
 
 @Module({
   imports: [AuthModule,
@@ -32,13 +34,15 @@ import { Report } from './reports/report.entity';
       username: process.env.POSTGRES_USER,
       password: process.env.POSTGRES_PASSWORD,
       database: process.env.POSTGRES_DB,
-      entities: [Quiz,Answer,Result,Report],
+      entities: [Quiz,Answer,Result,Report,PlaySession],
       synchronize: true,
+      autoLoadEntities:true
     }),
     QuizzesModule,
     ReportsModule,
     AnswersModule,
     ResultsModule,
+    PlaySessionsModule,
   
   ],
   controllers: [AppController],
@@ -48,7 +52,7 @@ export class AppModule {
   configure(consumer: MiddlewareConsumer) {
     consumer
       .apply(ZoomContextMiddleware)
-      .forRoutes('/','/quizzes','/reports')
+      .forRoutes('/','/quizzes','/reports','/play-sessions')
 
   }
 }

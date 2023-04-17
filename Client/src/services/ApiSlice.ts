@@ -1,8 +1,22 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/dist/query/react";
+import { RootState } from "../store/store";
 
 const baseQuery = fetchBaseQuery({
-    baseUrl: process.env.REACT_APP_BACK_SERVER_API,
-    credentials: 'include'
+    baseUrl: process.env.REACT_APP_BACK_URI,
+    credentials: 'include',
+    prepareHeaders:(headers,{getState}) =>
+    {
+
+        const zoomContext:any = (getState() as RootState).zoomContext;
+
+        if(zoomContext.context)
+        {
+            headers.set('x-zoom-app-context',zoomContext.context);
+        }
+
+        return headers;
+      
+    }
 });
 
 const baseQueryWithReauth = async (args?: any, api?: any, extraOptions?: any) => {

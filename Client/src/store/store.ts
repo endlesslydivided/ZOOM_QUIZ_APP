@@ -3,6 +3,8 @@ import {apiSlice} from "../services/ApiSlice";
 
 import quizzesReducer from "./slices/QuizzesSlice";
 import resultsReducer from "./slices/ResultsSlice";
+import zoomContextReducer from "./slices/ZoomContextSlice";
+import playSessionsReducer from "./slices/PlaySessionsSlice";
 
 
 export const store = configureStore({
@@ -10,6 +12,8 @@ export const store = configureStore({
         [apiSlice.reducerPath]: apiSlice.reducer,
         quizzes: quizzesReducer,
         results: resultsReducer,
+        zoomContext: zoomContextReducer,
+        playSessions: playSessionsReducer,
 
     },
     middleware: (getDefaultMiddleware) =>

@@ -23,6 +23,14 @@ async function bootstrap() {
 
   const viewDir = `${__dirname}/server/views`;
 
+  app.enableCors({
+    origin:  true,
+    credentials: true,
+    methods: "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS",
+    preflightContinue: false,
+    optionsSuccessStatus: 204
+  });
+  
   app.set('view engine', 'pug');
   app.set('views', viewDir);
 
@@ -97,13 +105,7 @@ async function bootstrap() {
       transform: true,
       exceptionFactory: ValidationExceptionFactory
     }));
-  app.enableCors({
-     origin:  true,
-     credentials: true,
-     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-     preflightContinue: false,
-     optionsSuccessStatus: 204
-   });
+  
   
   await app.listen( process.env.PORT || 3001);
 }

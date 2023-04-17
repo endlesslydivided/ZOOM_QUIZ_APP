@@ -1,0 +1,20 @@
+.answer-page-container
+{
+    display:grid;
+    margin: 15px 0px;
+
+    .ant-row.answer-row
+    {
+        width: 75vw;
+        justify-self:center;
+
+        .answer-postlist-col
+        {
+            .ant-space
+            {
+                width: 100%;
+                justify-self:center;
+            }
+        }
+    }
+}
