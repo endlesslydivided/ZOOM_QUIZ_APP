@@ -1,4 +1,5 @@
 import { Answer } from 'src/answers/answer.entity';
+import { PlaySession } from 'src/play-sessions/playSession.entity';
 import { Report } from 'src/reports/report.entity';
 import { Entity, Column, PrimaryGeneratedColumn, OneToMany, JoinColumn, Relation, JoinTable, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 
@@ -19,6 +20,12 @@ export class Quiz {
     createForeignKeyConstraints: true
     })
   reports: Report[];
+
+  @OneToMany(() => PlaySession,(session) => session.quiz, {
+    nullable:false,
+    createForeignKeyConstraints: true
+    })
+  playSession: PlaySession[];
 
   @OneToMany(() => Answer,(answer) => answer.quiz, {
     createForeignKeyConstraints: true

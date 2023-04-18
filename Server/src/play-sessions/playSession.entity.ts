@@ -1,4 +1,4 @@
-import { Column, CreateDateColumn, Entity, JoinColumn, OneToMany, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import { Quiz } from '../quizzes/quiz.entity';
 import { Result } from 'src/results/result.entity';
 
@@ -12,7 +12,7 @@ export class PlaySession {
   meetId: string;
 
 
-  @OneToOne(() => Quiz, {
+  @ManyToOne(() => Quiz, {
     eager:true,
     nullable:false,
     createForeignKeyConstraints: true

@@ -9,11 +9,17 @@ export const PlaySessionsApiSlice = apiSlice.injectEndpoints({
                 method: 'GET'
             }),
         }),
-       
+        getPlaySessionsResults: builder.query({
+            query: () => ({
+                url: '/play-sessions/results',
+                method: 'GET'
+            }),
+        }),
     })
 })
 
 
 export const {
     useGetPlaySessionsQuery,
+    useGetPlaySessionsResultsQuery
 } = PlaySessionsApiSlice;

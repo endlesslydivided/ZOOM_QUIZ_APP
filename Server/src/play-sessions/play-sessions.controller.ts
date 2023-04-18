@@ -9,10 +9,16 @@ export class PlaySessionsController {
 
     constructor(private playSessionsService: PlaySessionsService) {}
 
-    @Get()
+    @Get('/results')
     getPlaySessionsResults(@ZoomContext() context:any) 
     {
       return this.playSessionsService.getPlaySessionsResults(context);
+    }
+
+    @Get()
+    getPlaySessions(@ZoomContext() context:any) 
+    {
+      return this.playSessionsService.getPlaySessions(context);
     }
 }
 

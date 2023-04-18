@@ -11,6 +11,8 @@ import './PlaySessionList.scss'
 import { QuizServerEvent, SocketContext } from "../SocketProvider/SocketProvider";
 import { RootState } from "../../store/store";
 import { useGetPlaySessionsQuery } from "../../services/PlaySessionsApiSlice";
+import { setPlaySessions } from "../../store/slices/PlaySessionsSlice";
+import PlaySessionItem from "./PlaySessionItem";
 
 interface PlaySessionListProps
 {
@@ -21,28 +23,23 @@ interface PlaySessionListProps
 
 const PlaySessionList:React.FC<PlaySessionListProps> = () =>
 {
-    const playSessions:any = useAppSelector((state:any) => state.playSessions);
-
+    const playSessionsState:any = useAppSelector((state:any) => state.playSessions);
 
     const dispatch = useDispatch();
 
-    const socket:any = useContext(SocketContext);
-
-    const playSessionsResult = useGetPlaySessionsQuery({});
+    const playSessions = useGetPlaySessionsQuery({});
 
     useNotify(
         {
-            result:playSessionsResult,
+            result:playSessions,
             successCB:() =>
             {
-                const data = playSessionsResult.data;
+                const data = playSessions.data;
+                dispatch(setPlaySessions(data));
             }
     }) 
 
-    const answerQuiz = (answerId:string) =>
-    {
-    }
-     
+ 
 
     return (
         <Space size={'middle'} direction="vertical">
@@ -51,41 +48,15 @@ const PlaySessionList:React.FC<PlaySessionListProps> = () =>
 
         <List 
           itemLayout="horizontal" 
-          className="quiz-list" 
+          className="playsession-list" 
           split={true} 
           size={"small"} 
-          dataSource={playSessions}
-          renderItem={(session:any) => 
-            <List.Item>
-                <Card   className="playsession-list-card" 
-                        title={
-                        <Typography.Text>
-                            Quiz question: <Typography.Text type="secondary">{session.text}</Typography.Text>
-                        </Typography.Text>}>
-                        
-                    
-                    
-                    <Collapse className="answers-collapse">
-                        <Collapse.Panel header="Reveal answer" key="1">
-                        {
-                            session.answers.map((answer:any) =>
-                            <Card className={`answer-text ${answer.isCorrect  ? 'correct-answer' : 'wrong-answer'}`}>
-                                <Typography.Text>{answer.text}</Typography.Text>
-                            </Card>
-                                
-                            )
-                        }
-                        </Collapse.Panel>
-                       
-                    </Collapse>
-                    </Card>
-
-            </List.Item>}/>
+          dataSource={playSessionsState}
+          renderItem={(playSession:any) => <PlaySessionItem playSession={playSession}/>}/>
         </Space>
     )
 
 }
 
 export default PlaySessionList;
-
 

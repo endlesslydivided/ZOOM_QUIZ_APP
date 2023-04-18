@@ -77,12 +77,16 @@ export class QuizGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     }
 
     @SubscribeMessage(QuizServerEvent.CLIENT_SENDS_ANSWER)
-    async handleSendsAnswer(@MessageBody() body: any & CreateResultMessage) 
+    async handleSendsAnswer(@MessageBody() body: any & CreateResultMessage,
+    @ConnectedSocket() client: Socket) 
     {
-        const result = await this.resultsService.createResult(body.result);
-        const answers = await this.resultsService.createResult(body.result);
+        const zoomContext = client.handshake.auth.context && getAppContext(client.handshake.auth.context);
 
-        this.server.to(body?.userid).emit(QuizClientEvent.SERVER_SENDS_ANSWERS, {...result,answers});
+
+        const result = await this.resultsService.createResult({...body.result,userId:zoomContext.uid});
+        const answers = await this.quizzesService.getQuizAnswers(result.playSession.quiz.id);
+
+        this.server.to(body?.userid).emit(QuizClientEvent.SERVER_SENDS_ANSWERS, {results:[result],answers});
     }
 
     afterInit(server: Server) 
@@ -100,7 +104,7 @@ export class QuizGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     handleConnection(client: Socket, ...args: any[]) 
     {
         const auth = client.handshake.auth;
-        const zoomContext = auth.context && getAppContext(auth.context);
+        const zoomContext = auth.context && auth.context !== 'undefined' && getAppContext(auth.context);
 
         if(zoomContext.mid && zoomContext.uid)  
         {

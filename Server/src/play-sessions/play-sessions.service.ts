@@ -17,7 +17,7 @@ export class PlaySessionsService {
         await queryRunner.connect();
         await queryRunner.startTransaction();
 
-        const quiz = await this.dataSource.getRepository(Quiz).findOneBy({id:dto.quizId}).catch((error:any) =>
+        const quiz = await this.dataSource.getRepository(Quiz).findOne({where:{id:dto.quizId},relations:['answers']}).catch((error:any) =>
         {
             console.log(error);
             throw new InternalServerErrorException('Quiz isn`t found. Internal server error occure');
@@ -27,6 +27,7 @@ export class PlaySessionsService {
 
         
         playSession.meetId = dto.meetId;
+        playSession.quiz = quiz;
 
         const playSessionResult = await queryRunner.manager.save(playSession).catch(async (error:any) =>
         {
@@ -34,12 +35,7 @@ export class PlaySessionsService {
             await queryRunner.release();
             throw new InternalServerErrorException('PlaySession is not created. Internal server error occured.');
         });
-        
-        await this.dataSource
-        .createQueryBuilder()
-        .relation(PlaySession, "quiz")
-        .of(playSessionResult)
-        .add(quiz)
+       
         
         await queryRunner.commitTransaction();
         await queryRunner.release();
@@ -50,12 +46,32 @@ export class PlaySessionsService {
     {
         const playSessionsResults = await this.dataSource
         .createQueryBuilder()
-        .select("playSession").from(PlaySession,"playSessions")
-        .leftJoinAndMapMany("playSessions.quizzes","playSession.quiz","playSessionQuizzes")
-        .leftJoinAndMapOne("playSessions.result","playSession.results","playSessionUserResult",
+        .select("playSessions").from(PlaySession,"playSessions")
+        .leftJoinAndMapOne("playSessions.quiz","playSessions.quiz","playSessionQuizzes")
+        .leftJoinAndMapMany("playSessions.quiz.answers","playSessionQuizzes.answers","playSessionAnswers")
+        .leftJoinAndMapOne("playSessions.result","playSessions.results","playSessionUserResult",
         "playSessionUserResult.userId = :userId",{userId:context.uid})
         .getMany();
 
         return playSessionsResults;
+    }
+
+    async getPlaySessions(context:any)
+    {
+        const playSessions = await this.dataSource
+        .createQueryBuilder(PlaySession,"playSessions")
+        .leftJoinAndSelect("playSessions.quiz","quiz")
+        .leftJoinAndSelect("quiz.answers","answers")
+        .leftJoinAndSelect("playSessions.results","result","result.userId = :userId",{userId:context.uid})
+        .leftJoinAndSelect("result.answer","answer")
+        .select([
+            `playSessions.id`, `playSessions.meetId`, `playSessions.createdAt`, 
+            `quiz.id`, `quiz.userId`, `quiz.text`,`quiz.createdAt`,
+            `answers.id`,`answers.text`,`answers.isCorrect`,
+            `result.id`,`result.createdAt`,
+            `answer.id`,`answer.isCorrect`])
+
+        .getMany()
+        return playSessions;
     }
 }
