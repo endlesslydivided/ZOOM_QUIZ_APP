@@ -1,4 +1,4 @@
-import { forwardRef, Inject, Logger, UseGuards } from '@nestjs/common';
+import { forwardRef, Inject, Logger, UseFilters, UseGuards } from '@nestjs/common';
 import {
     MessageBody,
     OnGatewayConnection, OnGatewayDisconnect,
@@ -16,6 +16,8 @@ import { ResultsService } from 'src/results/results.service';
 import { CreateResultDTO } from 'src/results/dto/CreateResult.dto';
 import { getAppContext } from 'src/utils/cipher';
 import { ConnectedSocket } from '@nestjs/websockets';
+import { ZoomMeetGuard } from 'src/auth/guards/zoomMeet.guard';
+import { WsExceptionFilter } from 'src/exception/WsException.filter';
 
 export enum QuizClientEvent 
 {

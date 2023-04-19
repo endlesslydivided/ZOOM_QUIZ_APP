@@ -52,7 +52,7 @@ export class AppModule {
   configure(consumer: MiddlewareConsumer) {
     consumer
       .apply(ZoomContextMiddleware)
-      .forRoutes('/','/quizzes','/reports','/play-sessions')
+      .forRoutes('/','/context','/quizzes','/reports','/play-sessions','/play-quiz')
 
   }
 }

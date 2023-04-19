@@ -9,7 +9,9 @@ import ResultsPage from '../../pages/ResultsPage/ResultsPage';
 import AnswerPage from '../../pages/AnswerPage';
 import { useAppDispatch, useAppSelector } from '../../hooks/redux';
 import { setContext } from '../../store/slices/ZoomContextSlice';
-import { Typography } from 'antd';
+import { Typography, notification } from 'antd';
+import { getCookie } from '../../utils/cookie';
+import { useGetContextQuery } from '../../services/AuthApiSlice';
 
 
 interface AppRouterProps {
@@ -22,13 +24,14 @@ const AppRouter: React.FC<AppRouterProps>= () => {
 
     const dispatch = useAppDispatch();
     const zoomContext:any = useAppSelector((state:any) => state.zoomContext.context)
+    const getContextResult:any = useGetContextQuery({});
 
     useEffect(() =>
     {
-        const zoomContext = new URLSearchParams(window.location.search).get("context");
-        if(zoomContext)
+        const zoomContextParam = new URLSearchParams(window.location.search).get("context");
+        if(zoomContextParam)
         {
-            dispatch(setContext(zoomContext));
+            dispatch(setContext(zoomContextParam));
         }
     },[])
 
@@ -50,7 +53,7 @@ const AppRouter: React.FC<AppRouterProps>= () => {
                   
 
                 </Route>
-                <Route path="*" element={<Navigate to={QUIZZES_ROUTE}  replace={true}/>}/>
+                <Route path="*" element={<Navigate to={`${QUIZZES_ROUTE}`}  replace={true}/>}/>
             </Routes>
         </SocketProvider>
     )

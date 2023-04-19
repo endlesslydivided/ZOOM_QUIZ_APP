@@ -1,4 +1,4 @@
-import { Button, Card, Collapse, List, Modal, Space, Typography, notification } from "antd";
+import { Button, Card, Collapse, List, Modal, Space, Tooltip, Typography, notification } from "antd";
 import { useDispatch } from "react-redux";
 import { useAppSelector } from "../../hooks/redux";
 import { useNotify } from "../../hooks/useNotify";
@@ -21,6 +21,7 @@ interface QuizListProps
 const QuizList:React.FC<QuizListProps> = () =>
 {
     const quizzes:any = useAppSelector((state:any) => state.quizzes);
+    const context:any = useAppSelector((state:any) => state.zoomContext.decrypted);
 
 
     const dispatch = useDispatch();
@@ -59,6 +60,7 @@ const QuizList:React.FC<QuizListProps> = () =>
           loading={quizzesResult.isFetching} 
           className="quiz-list" 
           split={true} 
+          grid={{gutter:10,column:1}}
           size={"small"} 
           dataSource={quizzes}
           renderItem={(quiz:any) => 
@@ -68,9 +70,10 @@ const QuizList:React.FC<QuizListProps> = () =>
                         <Typography.Text>
                             Quiz question: <Typography.Text type="secondary">{quiz.text}</Typography.Text>
                         </Typography.Text>}
-                        extra={<Button onClick={() =>provideQuiz(quiz.id)}  
+                        extra={<Tooltip title={context?.mid ? 'Send quiz' : 'Only active on meetings'} > 
+                        <Button onClick={() =>provideQuiz(quiz.id)} disabled={!!!context?.mid}
                         icon={<SendOutlined/>} 
-                        type="text">Activate quiz</Button>}>
+                        type="text">Activate quiz</Button></Tooltip> }>
                     
                     
                     <Collapse className="answers-collapse">

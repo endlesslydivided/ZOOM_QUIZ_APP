@@ -4,6 +4,7 @@ import { Request, Response } from 'express';
 import { contextHeader, getAppContext } from './utils/cipher.js';
 import { Session as ExpressSession} from 'express-session';
 import { ZoomContextGuard } from './auth/guards/zoomContext.guard';
+import { ZoomContext } from './auth/decorators/zoomContext.decorator';
 
 @Controller()
 export class AppController {
@@ -14,8 +15,20 @@ export class AppController {
     try
     {
       const context = req.header(contextHeader);
-      res.cookie("zoomContext",context,{maxAge: 2147483647 ,httpOnly:true, secure:true, sameSite:"lax"});
+      res.cookie("zoomContext",req['zoomContext'],{maxAge: 2147483647 , secure:true, sameSite:"lax"});
       res.redirect(process.env.REACT_APP_URI + `?context=${context}`);
+    } 
+    catch (e) 
+    {
+      throw e;
+    }
+  }
+
+  @Get('/context')
+  async contextRoute(@ZoomContext() zoomContext:any): Promise<void> {
+    try
+    {
+      return zoomContext;
     } 
     catch (e) 
     {

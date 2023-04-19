@@ -45,13 +45,18 @@ export class PlaySessionsService {
     async getPlaySessionsResults(context:any)
     {
         const playSessionsResults = await this.dataSource
-        .createQueryBuilder()
-        .select("playSessions").from(PlaySession,"playSessions")
-        .leftJoinAndMapOne("playSessions.quiz","playSessions.quiz","playSessionQuizzes")
-        .leftJoinAndMapMany("playSessions.quiz.answers","playSessionQuizzes.answers","playSessionAnswers")
-        .leftJoinAndMapOne("playSessions.result","playSessions.results","playSessionUserResult",
-        "playSessionUserResult.userId = :userId",{userId:context.uid})
-        .getMany();
+        .createQueryBuilder(PlaySession,"playSessions")
+        .leftJoinAndSelect("playSessions.quiz","quiz")
+        .leftJoinAndSelect("quiz.answers","answers")
+        .leftJoinAndSelect("playSessions.results","result","result.userId = :userId",{userId:context.uid})
+        .leftJoinAndSelect("result.answer","answer")
+        .select([
+            `playSessions.id`, `playSessions.meetId`, `playSessions.createdAt`, 
+            `quiz.id`, `quiz.userId`, `quiz.text`,`quiz.createdAt`,
+            `answers.id`,`answers.text`,`answers.isCorrect`,
+            `result.id`,`result.createdAt`,
+            `answer.id`,`answer.isCorrect`])
+        .getMany()
 
         return playSessionsResults;
     }
@@ -70,7 +75,7 @@ export class PlaySessionsService {
             `answers.id`,`answers.text`,`answers.isCorrect`,
             `result.id`,`result.createdAt`,
             `answer.id`,`answer.isCorrect`])
-
+        .where("playSessions.meetId = :meetId",{meetId:context.mid})
         .getMany()
         return playSessions;
     }

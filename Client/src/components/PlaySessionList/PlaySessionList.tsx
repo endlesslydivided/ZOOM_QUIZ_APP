@@ -51,6 +51,9 @@ const PlaySessionList:React.FC<PlaySessionListProps> = () =>
           className="playsession-list" 
           split={true} 
           size={"small"} 
+          loading={playSessions.isFetching} 
+
+          grid={{gutter:10,column:1}}
           dataSource={playSessionsState}
           renderItem={(playSession:any) => <PlaySessionItem playSession={playSession}/>}/>
         </Space>

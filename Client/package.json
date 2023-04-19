@@ -13,6 +13,8 @@
     "@types/react": "^18.0.35",
     "@types/react-dom": "^18.0.11",
     "antd": "^5.4.2",
+    "buffer": "^6.0.3",
+    "crypto-browserify": "^3.12.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-redux": "^8.0.5",
@@ -21,6 +23,7 @@
     "sass": "^1.62.0",
     "scss": "^0.2.4",
     "socket.io-client": "^4.6.1",
+    "stream-browserify": "^3.0.0",
     "typescript": "^4.9.5",
     "web-vitals": "^2.1.4"
   },

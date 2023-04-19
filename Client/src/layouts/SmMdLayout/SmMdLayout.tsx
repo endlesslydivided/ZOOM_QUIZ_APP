@@ -7,33 +7,35 @@ import './SmMdLayout.scss';
 
 const { Header,Content,Footer} = Layout;
 
-const items: MenuProps['items'] = [
-    {
-        label: (<Typography.Text strong type='secondary'>
-                    <NavLink to={`../${QUIZZES_ROUTE}`}>Your quizzes</NavLink>
-                </Typography.Text>),
-        key: QUIZZES_ROUTE,
-    },
-    {
-        label: (<Typography.Text strong type='secondary'>
-                    <NavLink to={`../${ANSWER_ROUTE}`}>Answer!</NavLink>
-                </Typography.Text>),
-        key: ANSWER_ROUTE,
-    },
-    {
-      label: (<Typography.Text strong type='secondary'>
-                <NavLink to={`../${RESULTS_ROUTE}`}>Results</NavLink>
-              </Typography.Text>),
-      key: RESULTS_ROUTE,
-    }
-];
+
 
 
 export default function SmMdLayout() 
 {
-
+    const zoomContext:any = useAppSelector((state:any) => state.zoomContext.context)
 
     const navigate = useNavigate();
+
+    const items: MenuProps['items'] = [
+        {
+            label: (<Typography.Text strong type='secondary'>
+                        <NavLink to={`../${QUIZZES_ROUTE}?context=${zoomContext}`}>Your quizzes</NavLink>
+                    </Typography.Text>),
+            key: QUIZZES_ROUTE,
+        },
+        {
+            label: (<Typography.Text strong type='secondary'>
+                        <NavLink to={`../${ANSWER_ROUTE}?context=${zoomContext}`}>Answer!</NavLink>
+                    </Typography.Text>),
+            key: ANSWER_ROUTE,
+        },
+        {
+          label: (<Typography.Text strong type='secondary'>
+                    <NavLink to={`../${RESULTS_ROUTE}?context=${zoomContext}`}>Results</NavLink>
+                  </Typography.Text>),
+          key: RESULTS_ROUTE,
+        }
+    ];
 
 
     const currentPath = 
