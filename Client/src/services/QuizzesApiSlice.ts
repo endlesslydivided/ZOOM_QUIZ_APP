@@ -12,11 +12,22 @@ export const QuizzesApiSlice = apiSlice.injectEndpoints({
         }),
 
         getUserQuizzes: builder.query({
-            query: () => ({
+            query: ({filters}) => ({
                 url: '/quizzes',
-                method: 'GET'
+                method: 'GET',
+                params:filters
             }),
         }),
+
+      
+
+        deleteQuiz: builder.mutation({
+            query: ({quizId}) => ({
+                url: `/quizzes/${quizId}`,
+                method: 'DELETE'
+            }),
+        }),
+       
        
     })
 })
@@ -24,5 +35,7 @@ export const QuizzesApiSlice = apiSlice.injectEndpoints({
 
 export const {
     useCreateQuizMutation,
-    useGetUserQuizzesQuery
+    useGetUserQuizzesQuery,
+    useDeleteQuizMutation,
+    
 } = QuizzesApiSlice;

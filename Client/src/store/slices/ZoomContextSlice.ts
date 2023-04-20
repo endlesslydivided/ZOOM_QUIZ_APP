@@ -2,7 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 
 
 export const zoomContextSlice: any = createSlice({
-  initialState: {context: null,decrypted:null},
+  initialState: {context: null,decrypted:null,token:null},
   name: "zoomContextSlice",
   reducers: {
     setContext: (state: any, action) => {
@@ -16,6 +16,12 @@ export const zoomContextSlice: any = createSlice({
       state.decrypted = context;
 
       return  state;
+    },
+    setToken: (state: any, action) => {
+      const token = action.payload;
+      state.token = token;
+
+      return  state;
     }
   }
 }
@@ -23,7 +29,8 @@ export const zoomContextSlice: any = createSlice({
 
 export const {
   setContext,
-  setDecryptedContext
+  setDecryptedContext,
+  setToken
 } = zoomContextSlice.actions;
 
 export default zoomContextSlice.reducer;

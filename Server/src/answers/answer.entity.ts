@@ -1,7 +1,6 @@
 import { Quiz } from 'src/quizzes/quiz.entity';
-import { Report } from 'src/reports/report.entity';
 import { Result } from 'src/results/result.entity';
-import { Entity, Column, PrimaryGeneratedColumn, OneToOne, JoinColumn, OneToMany, Relation, JoinTable, ManyToOne } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity({name:'answer'})
 export class Answer {
@@ -15,12 +14,7 @@ export class Answer {
 
   @Column({ default: false })
   isCorrect: boolean;
-  
-  @OneToMany(() => Report,(report) => report.answer, {
-    eager: true,
-    nullable:true,
-    })
-  reports: Report[];
+
 
   @OneToMany(() => Result,(result) => result.answer, {
     nullable:true

@@ -1,4 +1,4 @@
-import { forwardRef, Inject, Logger, UseFilters, UseGuards } from '@nestjs/common';
+import { forwardRef, Inject, Logger, UseGuards } from '@nestjs/common';
 import {
     MessageBody,
     OnGatewayConnection, OnGatewayDisconnect,
@@ -8,16 +8,14 @@ import {
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 
+import { ConnectedSocket } from '@nestjs/websockets';
 import { ZoomContextGuard } from 'src/auth/guards/zoomContext.guard';
-import { QuizzesService } from './quizzes.service';
 import { CreatePlaySessionDTO } from 'src/play-sessions/dto/CreatePlaySession';
 import { PlaySessionsService } from 'src/play-sessions/play-sessions.service';
-import { ResultsService } from 'src/results/results.service';
 import { CreateResultDTO } from 'src/results/dto/CreateResult.dto';
+import { ResultsService } from 'src/results/results.service';
 import { getAppContext } from 'src/utils/cipher';
-import { ConnectedSocket } from '@nestjs/websockets';
-import { ZoomMeetGuard } from 'src/auth/guards/zoomMeet.guard';
-import { WsExceptionFilter } from 'src/exception/WsException.filter';
+import { QuizzesService } from './quizzes.service';
 
 export enum QuizClientEvent 
 {

@@ -1,7 +1,6 @@
 import { Answer } from 'src/answers/answer.entity';
 import { PlaySession } from 'src/play-sessions/playSession.entity';
-import { Report } from 'src/reports/report.entity';
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany, JoinColumn, Relation, JoinTable, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Column, CreateDateColumn, DeleteDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 
 @Entity({name:'quiz'})
 export class Quiz {
@@ -15,17 +14,13 @@ export class Quiz {
   @Column()
   text: string;
 
-  @OneToMany(() => Report,(report) => report.quiz, {
-    nullable:true,
-    createForeignKeyConstraints: true
-    })
-  reports: Report[];
+
 
   @OneToMany(() => PlaySession,(session) => session.quiz, {
     nullable:false,
     createForeignKeyConstraints: true
     })
-  playSession: PlaySession[];
+  playSessions: PlaySession[];
 
   @OneToMany(() => Answer,(answer) => answer.quiz, {
     createForeignKeyConstraints: true
@@ -37,5 +32,8 @@ export class Quiz {
 
   @UpdateDateColumn({name: 'updatedAt'})
   updatedAt: Date;
+
+  @DeleteDateColumn({name:'deletedAt'})
+  deletedAt?: Date;
 
 }

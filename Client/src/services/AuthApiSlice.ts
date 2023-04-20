@@ -1,6 +1,6 @@
 import { notification } from "antd";
 import {apiSlice} from "./ApiSlice";
-import { setDecryptedContext } from "../store/slices/ZoomContextSlice";
+import { setDecryptedContext, setToken } from "../store/slices/ZoomContextSlice";
 
 
 export const authApiSlice = apiSlice.injectEndpoints({
@@ -19,10 +19,28 @@ export const authApiSlice = apiSlice.injectEndpoints({
 
             }
         }),
+
+        getToken: builder.query({
+            query: ({params}) => ({
+                url: '/auth/token',
+                method: 'GET',
+                credentials: 'include',
+                params
+            }),
+            onQueryStarted: async (id, {dispatch, queryFulfilled}) => {
+                
+                
+                const {data} = await queryFulfilled;
+                dispatch(setToken(data));
+                notification.success({message:`Data: ${JSON.stringify(data)}`});
+
+            }
+        }),
     })
 })
 
 
 export const {
-    useGetContextQuery
+    useGetContextQuery,
+    useLazyGetTokenQuery
 } = authApiSlice;

@@ -1,13 +1,19 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { Inject, Injectable, InternalServerErrorException, forwardRef } from '@nestjs/common';
 import { DataSource } from 'typeorm';
 import { CreatePlaySessionDTO } from './dto/CreatePlaySession';
 import { Quiz } from 'src/quizzes/quiz.entity';
 import { PlaySession } from './playSession.entity';
+import DBQueryParameters from 'src/requestFeatures/dbquery.params';
+import { filter } from 'rxjs';
+import { AuthService } from 'src/auth/auth.service';
+import { ZoomContext } from 'src/auth/decorators/zoomContext.decorator';
 
 @Injectable()
 export class PlaySessionsService {
 
-    constructor(private dataSource: DataSource) {}
+    constructor(private dataSource: DataSource,
+        @Inject(forwardRef(() => AuthService)) private authService: AuthService,
+) {}
     
 
     async createPlaySession(dto:CreatePlaySessionDTO)
@@ -42,10 +48,10 @@ export class PlaySessionsService {
         return playSessionResult;
     }
 
-    async getPlaySessionsResults(context:any)
+    async getPlaySessionsResults(filters:DBQueryParameters,context:any)
     {
         const playSessionsResults = await this.dataSource
-        .createQueryBuilder(PlaySession,"playSessions")
+        .createQueryBuilder(PlaySession,"playSessions").withDeleted()
         .leftJoinAndSelect("playSessions.quiz","quiz")
         .leftJoinAndSelect("quiz.answers","answers")
         .leftJoinAndSelect("playSessions.results","result","result.userId = :userId",{userId:context.uid})
@@ -56,7 +62,10 @@ export class PlaySessionsService {
             `answers.id`,`answers.text`,`answers.isCorrect`,
             `result.id`,`result.createdAt`,
             `answer.id`,`answer.isCorrect`])
-        .getMany()
+        .take(filters.limit)
+        .skip(filters.offset)
+        .getManyAndCount()
+
 
         return playSessionsResults;
     }
@@ -65,7 +74,7 @@ export class PlaySessionsService {
     {
         const playSessions = await this.dataSource
         .createQueryBuilder(PlaySession,"playSessions")
-        .leftJoinAndSelect("playSessions.quiz","quiz")
+        .leftJoinAndSelect("playSessions.quiz","quiz","quiz.deletedAt IS NOT NULL")
         .leftJoinAndSelect("quiz.answers","answers")
         .leftJoinAndSelect("playSessions.results","result","result.userId = :userId",{userId:context.uid})
         .leftJoinAndSelect("result.answer","answer")
@@ -79,4 +88,9 @@ export class PlaySessionsService {
         .getMany()
         return playSessions;
     }
-}
+
+    async getPlaySessionReport(playSessionId:string,context:ZoomContext)
+    {
+        const meetingUsers = await this.authService.apiRequest('GET',`/past_meetings/${playSessionId}/participants`,process.env.ZM_SECRET_TOKEN);
+        return meetingUsers;
+    }}

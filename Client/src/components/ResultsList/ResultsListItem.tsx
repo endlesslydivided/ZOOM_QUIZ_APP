@@ -41,16 +41,11 @@ const ResultsItem:React.FC<ResultsItemProps>= ({result}) =>
                         }
                     </Typography.Text>
                 }>
+                 
 
-
-                <Collapse className="answers-collapse">
-                    <Collapse.Panel header="Reveal answers" key="1">
                     {
                         result.quiz.answers?.map((answer:any) =><ResultsAnswerItem answer={answer} result={result}/>)
                     }
-                    </Collapse.Panel>
-                    
-                </Collapse>
             </Card>
 
         </List.Item>
@@ -72,9 +67,11 @@ const ResultsAnswerItem = ({answer,result}:any) =>
 
 
     return (
-        <Button disabled={isResult} className={answerClasses} block >
+        <Card className={answerClasses}>
             <Typography.Text>{answer.text}</Typography.Text>
-        </Button>
+            {isUserAnswer && <Typography.Text type="secondary"> - Your answer</Typography.Text>}
+        </Card>
+   
     )
 }
 

@@ -15,7 +15,7 @@ export class PlaySession {
   @ManyToOne(() => Quiz, {
     eager:true,
     nullable:false,
-    createForeignKeyConstraints: true
+    createForeignKeyConstraints: true,
     })
   @JoinColumn({name:'quizId',referencedColumnName:'id'})
   quiz: Quiz;

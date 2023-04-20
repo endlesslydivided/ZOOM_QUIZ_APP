@@ -7,7 +7,8 @@ export class AuthService
 {
     private host:any;
     private baseURL:any;
-    
+    private accessToken:any;
+
     constructor()
     {
         this.host = new URL( process.env.ZM_HOST || 'https://zoom.us');
@@ -32,10 +33,14 @@ export class AuthService
                 username,
                 password,
             },
-        }).then(({ data }) => Promise.resolve(data));
+        }).then(({ data }) =>
+        {
+            return Promise.resolve(data)
+        })
+        .catch((error) => console.log(error));
     }
 
-
+   
     async apiRequest(method, endpoint, token, data = null)
     {
         return axios({
@@ -46,10 +51,14 @@ export class AuthService
             headers: {
                 Authorization: `Bearer ${token}`,
             },
-        }).then(({ data }) => Promise.resolve(data));
+        }).then(({ data }) =>
+        {
+            return Promise.resolve(data)
+        })
+        .catch((error) => console.log(error));
     }
 
-    async  getToken(code, verifier) 
+    async  getToken(code, verifier,code_challenge_method) 
     {
         if (!code || typeof code !== 'string')
         {
@@ -58,7 +67,7 @@ export class AuthService
 
         if (!verifier || typeof verifier !== 'string')
         {
-            throw new InternalServerErrorException('code verifier code must be a valid string')
+            throw new InternalServerErrorException('Code verifier code must be a valid string')
         }
 
         return this.tokenRequest({
@@ -66,8 +75,10 @@ export class AuthService
             code_verifier: verifier,
             redirect_uri: process.env.ZM_REDIRECT_URL,
             grant_type: 'authorization_code',
+            code_challenge_method
         });
     }
+
 
 
     async refreshToken (token)

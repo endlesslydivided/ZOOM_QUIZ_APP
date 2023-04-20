@@ -12,9 +12,12 @@
     "@types/node": "^16.18.23",
     "@types/react": "^18.0.35",
     "@types/react-dom": "^18.0.11",
+    "@zoom/appssdk": "^0.16.11",
     "antd": "^5.4.2",
     "buffer": "^6.0.3",
     "crypto-browserify": "^3.12.0",
+    "dayjs": "^1.11.7",
+    "jquery": "^3.6.4",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-redux": "^8.0.5",
@@ -52,6 +55,7 @@
     ]
   },
   "devDependencies": {
+    "@types/jquery": "^3.5.16",
     "@types/react-redux": "^7.1.25",
     "@types/react-router-dom": "^5.3.3"
   }

@@ -1,8 +1,6 @@
 import { Answer } from 'src/answers/answer.entity';
 import { PlaySession } from 'src/play-sessions/playSession.entity';
-import { Quiz } from 'src/quizzes/quiz.entity';
-import { Report } from 'src/reports/report.entity';
-import { Entity, Column, PrimaryGeneratedColumn, OneToOne, JoinColumn, OneToMany, Relation, ManyToOne, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 
 @Entity({name:'result'})
 export class Result {

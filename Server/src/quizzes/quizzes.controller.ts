@@ -1,8 +1,10 @@
-import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Query, UseGuards } from '@nestjs/common';
 import { QuizzesService } from './quizzes.service';
 import { ZoomContextGuard } from 'src/auth/guards/zoomContext.guard';
 import { CreateQuizDTO } from './dto/createQuiz.dto';
 import { ZoomContext } from 'src/auth/decorators/zoomContext.decorator';
+import { QueryParamsPipe } from 'src/requestFeatures/queryParams.pipe';
+import QueryParameters from 'src/requestFeatures/query.params';
 
 @Controller('quizzes')
 @UseGuards(ZoomContextGuard)
@@ -17,8 +19,16 @@ export class QuizzesController {
     }
 
     @Get()
-    getUserQuizzes(@ZoomContext() context:any) 
+    getUserQuizzes(@ZoomContext() context:any,@Query(new QueryParamsPipe()) filters: QueryParameters) 
     {
-      return this.quizzesService.getUserQuizzes(context);
+      return this.quizzesService.getUserQuizzes(filters,context);
+    }
+
+  
+
+    @Delete(':quizId')
+    deleteQuiz(@Param('quizId') quizId: string) 
+    {
+      return this.quizzesService.deleteQuiz(quizId);
     }
 }

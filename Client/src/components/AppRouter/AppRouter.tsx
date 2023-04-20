@@ -1,5 +1,5 @@
 import React, { createContext, useEffect } from 'react';
-import { Navigate, Route, Routes } from 'react-router-dom';
+import { Link, Navigate, Route, Routes } from 'react-router-dom';
 import UserSmMdLayout from '../../layouts/SmMdLayout/SmMdLayout';
 
 import { ANSWER_ROUTE, QUIZZES_ROUTE, RESULTS_ROUTE } from '../../utils/consts';
@@ -12,6 +12,9 @@ import { setContext } from '../../store/slices/ZoomContextSlice';
 import { Typography, notification } from 'antd';
 import { getCookie } from '../../utils/cookie';
 import { useGetContextQuery } from '../../services/AuthApiSlice';
+import './AppRouter.scss'
+import { UploadOutlined } from '@ant-design/icons';
+import Loader from '../Loader';
 
 
 interface AppRouterProps {
@@ -23,8 +26,8 @@ export const PostListContext:any = createContext(null);
 const AppRouter: React.FC<AppRouterProps>= () => {
 
     const dispatch = useAppDispatch();
-    const zoomContext:any = useAppSelector((state:any) => state.zoomContext.context)
-    const getContextResult:any = useGetContextQuery({});
+    const zoomContext:any = useAppSelector((state:any) => state.zoomContext.context);
+    const getContextResult = useGetContextQuery({});
 
     useEffect(() =>
     {
@@ -35,9 +38,21 @@ const AppRouter: React.FC<AppRouterProps>= () => {
         }
     },[])
 
+    if(getContextResult.isFetching || getContextResult.isLoading)
+    {
+        return <Loader/>
+    }
+
     if(!zoomContext)
     {
-        return <Typography.Title>Install app and open it from ZOOM!</Typography.Title>
+        return (
+        <div className='install-text-container'>
+            <UploadOutlined />
+
+            <Typography.Text type='secondary'>
+                <Link to={process.env.REACT_APP_BACK_URI + '/install'}>Install</Link> app and open it from ZOOM!
+            </Typography.Text>
+        </div>)
     }
  
     return (

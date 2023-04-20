@@ -1,15 +1,16 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Quiz } from './quiz.entity';
-import { DataSource, Repository } from 'typeorm';
-import { CreateQuizDTO } from './dto/createQuiz.dto';
+import { Inject, Injectable, InternalServerErrorException, forwardRef } from '@nestjs/common';
 import { Answer } from 'src/answers/answer.entity';
 import { ZoomContext } from 'src/auth/decorators/zoomContext.decorator';
+import DBQueryParameters from 'src/requestFeatures/dbquery.params';
+import { DataSource } from 'typeorm';
+import { CreateQuizDTO } from './dto/createQuiz.dto';
+import { Quiz } from './quiz.entity';
+import { AuthService } from 'src/auth/auth.service';
 
 @Injectable()
 export class QuizzesService {
 
-    constructor(private dataSource: DataSource) {}
+    constructor(private dataSource: DataSource,) {}
     
 
     async createQuiz(quizDto:CreateQuizDTO,context:ZoomContext)
@@ -51,18 +52,24 @@ export class QuizzesService {
         return quizResult;
     }
 
-    async getUserQuizzes(context:any)
+    async getUserQuizzes(filters:DBQueryParameters,context:any)
     {
         const quizRepository = this.dataSource.getRepository(Quiz);
-        const quizzes = await quizRepository.find({where:{userId:context.uid}, relations:{answers:true,reports:true}}).catch((error:any) =>
-        {
-            console.log(error);
-            throw new InternalServerErrorException('User quizzes aren`t found. Internal server error occure');
-        });
+        const quizzes = await quizRepository.findAndCount({
+            take:filters.limit,
+            skip: filters.offset,
+            where:{userId:context.uid}, 
+            relations:{answers:true,playSessions:true}})
+            .catch((error:any) =>
+            {
+                console.log(error);
+                throw new InternalServerErrorException('User quizzes aren`t found. Internal server error occure');
+            });
         return quizzes;
     }
 
-    async getOneQuiz(quizId:any)
+
+    async getOneQuiz(quizId:string)
     {
         const quizRepository = this.dataSource.getRepository(Quiz);
         const quizz = await quizRepository.findOneBy({id:quizId}).catch((error:any) =>
@@ -73,7 +80,10 @@ export class QuizzesService {
         return quizz;
     }
 
-    async getQuizAnswers(quizId:any)
+
+
+
+    async getQuizAnswers(quizId:string)
     {
         const answerRepository = this.dataSource.getRepository(Answer);
         const answers = await answerRepository.findBy({quiz:{id:quizId}}).catch((error:any) =>
@@ -82,6 +92,18 @@ export class QuizzesService {
             throw new InternalServerErrorException('Answers aren`t found. Internal server error occure');
         });
         return answers;
+
+    }
+
+    async deleteQuiz(quizId:any)
+    {
+        const quizRepository = this.dataSource.getRepository(Quiz);
+        const result = await quizRepository.softDelete(quizId).catch((error:any) =>
+        {
+            console.log(error);
+            throw new InternalServerErrorException('Quiz isn`t deleted. Internal server error occure');
+        });
+        return result;
 
     }
 }

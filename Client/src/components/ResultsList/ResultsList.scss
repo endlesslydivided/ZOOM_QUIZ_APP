@@ -4,7 +4,10 @@
 {
     padding:0px;
     margin: 0px;
-
+    .ant-pagination
+    {
+        margin-left: 50%;
+    }
     .ant-list-item
     {
         padding: 0px;
@@ -16,11 +19,11 @@
         width:100%;
 
 
-        .answers-collapse
-        {
-            width: 100%;
             .answer-text
             {
+                width: 100%;
+                display: flex;
+                align-content: space-between;
                 &.wrong-answer
                 {
                     
@@ -37,8 +40,6 @@
                     filter:saturate(2)
                 }
             }
-
-        }
     }
 }
 

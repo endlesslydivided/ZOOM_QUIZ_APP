@@ -8,12 +8,16 @@ const baseQuery = fetchBaseQuery({
     {
 
         const zoomContext:any = (getState() as RootState).zoomContext;
+        const zoomContextParam = new URLSearchParams(window.location.search).get("context");
 
         if(zoomContext.context)
         {
             headers.set('x-zoom-app-context',zoomContext.context);
         }
-
+        else if(zoomContextParam)
+        {
+            headers.set('x-zoom-app-context',zoomContextParam);
+        }
         return headers;
       
     }
