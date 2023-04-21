@@ -1,18 +1,26 @@
-import type { MenuProps } from 'antd';
-import { Layout, Menu, Typography } from 'antd';
+import { Avatar, MenuProps } from 'antd';
+import { Layout, Menu,Image,Typography } from 'antd';
 import { NavLink, useNavigate, Outlet } from 'react-router-dom';
 import { useAppSelector } from '../../hooks/redux';
 import { ANSWER_ROUTE, QUIZZES_ROUTE, RESULTS_ROUTE } from '../../utils/consts';
 import './SmMdLayout.scss';
+import { QuestionOutlined, SmileOutlined, TrophyOutlined } from '@ant-design/icons';
 
-const { Header,Content,Footer} = Layout;
+//@ts-expect-error
+import logo from '../../assets/logo/logo.png';
+
+
+const { Header,Content} = Layout;
 
 
 
 
 export default function SmMdLayout() 
 {
-    const zoomContext:any = useAppSelector((state:any) => state.zoomContext.context)
+    const zoomContext:any = useAppSelector((state:any) => state.zoomContext.context);
+
+
+    const user = useAppSelector((state:any) => state.zoomContext?.user)
 
     const navigate = useNavigate();
 
@@ -21,19 +29,22 @@ export default function SmMdLayout()
             label: (<Typography.Text strong type='secondary'>
                         <NavLink to={`../${QUIZZES_ROUTE}?context=${zoomContext}`}>Your quizzes</NavLink>
                     </Typography.Text>),
+            icon:<QuestionOutlined/>,
             key: QUIZZES_ROUTE,
         },
         {
             label: (<Typography.Text strong type='secondary'>
                         <NavLink to={`../${ANSWER_ROUTE}?context=${zoomContext}`}>Answer!</NavLink>
                     </Typography.Text>),
+            icon:<SmileOutlined/>,
             key: ANSWER_ROUTE,
         },
         {
-          label: (<Typography.Text strong type='secondary'>
-                    <NavLink to={`../${RESULTS_ROUTE}?context=${zoomContext}`}>Results</NavLink>
-                  </Typography.Text>),
-          key: RESULTS_ROUTE,
+            label: (<Typography.Text strong type='secondary'>
+                        <NavLink to={`../${RESULTS_ROUTE}?context=${zoomContext}`}>Results</NavLink>
+                    </Typography.Text>),
+            icon:<TrophyOutlined/>,
+            key: RESULTS_ROUTE,
         }
     ];
 
@@ -46,18 +57,25 @@ export default function SmMdLayout()
     return (
         <Layout className={`smMd-layout `}>
             <Header>
-
+                <div onClick={() => navigate(QUIZZES_ROUTE)} style={{cursor:'pointer'}}>
+                    <Image preview={false} width={130} src={logo}/>
+                </div>
                 <div className='header-nav-container'>
                     <Menu selectedKeys={[currentPath]} mode="horizontal" items={items}/>
                 </div>
+
+
+                    <div className='header-popover-container'>
+                    <Typography.Text type="secondary">
+                            Welcome{user ? ', ' + user.display_name : ', Player'}!
+                    </Typography.Text>
+                    </div>
                
             </Header>
             <Content>
                 <Outlet/>
             </Content>
-            {/* <Footer style={{ background: "#F2F2F2",position:'sticky',height:'100%',textAlign:'center'}}>
-                <Typography.Title disabled level={5}> created by endlesslydivided, 2023</Typography.Title>
-            </Footer> */}
+
         </Layout>
     );
 }

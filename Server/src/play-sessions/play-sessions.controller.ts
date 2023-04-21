@@ -4,6 +4,8 @@ import { PlaySessionsService } from './play-sessions.service';
 import { ZoomContext } from 'src/auth/decorators/zoomContext.decorator';
 import { QueryParamsPipe } from 'src/requestFeatures/queryParams.pipe';
 import QueryParameters from 'src/requestFeatures/query.params';
+import { AccessTokenGuard } from 'src/auth/guards/accessToken.guard';
+import { ZoomAccessToken } from 'src/auth/decorators/accessToken.decorator';
 
 @Controller('play-sessions')
 @UseGuards(ZoomContextGuard)

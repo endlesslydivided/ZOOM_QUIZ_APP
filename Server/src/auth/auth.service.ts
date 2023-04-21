@@ -94,9 +94,9 @@ export class AuthService
         });
     }
 
-    async getZoomUser (uid, token)
+    async getMe (token)
     {
-        return this.apiRequest('GET', `/users/${uid}`, token);
+        return this.apiRequest('GET', `/users/me`, token);
     }
 
     async getDeeplink(token)

@@ -59,7 +59,8 @@ export class QuizzesService {
             take:filters.limit,
             skip: filters.offset,
             where:{userId:context.uid}, 
-            relations:{answers:true,playSessions:true}})
+            relations:{answers:true,playSessions:true}},
+            )
             .catch((error:any) =>
             {
                 console.log(error);

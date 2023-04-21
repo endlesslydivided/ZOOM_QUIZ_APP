@@ -1,5 +1,8 @@
 import { Button, Card, Collapse, List, Typography } from "antd";
 import './ResultsList.scss';
+import { useState } from "react";
+import QuizStatsModal from "../QuizList/QuizStatsModal";
+import { InfoCircleOutlined } from "@ant-design/icons";
 
 interface ResultsItemProps
 {
@@ -18,8 +21,12 @@ const ResultsItem:React.FC<ResultsItemProps>= ({result}) =>
     const yourAnswerText = isResult ? isCorrect ? " Correct!" : " Incorrect(" : " No answer";
     const yourAnswerStyle = isResult ? {color:isCorrect?'rgba(9, 208, 59, 0.771)' : 'rgba(214, 80, 80, 0.633)'} : {};
     
+    const [isModalOpened,setIsModalOpened] = useState(false);
+
+
     return (
         <List.Item>
+            <QuizStatsModal isModalOpened={isModalOpened} setIsModalOpened={setIsModalOpened} playSessions={[result]}/>
             <Card   
                 className="results-list-card" 
                 title={
@@ -29,6 +36,7 @@ const ResultsItem:React.FC<ResultsItemProps>= ({result}) =>
                     
                 extra=
                 {
+                    <>
                     <Typography.Text>
                         Your answer: 
                         {
@@ -40,6 +48,8 @@ const ResultsItem:React.FC<ResultsItemProps>= ({result}) =>
                                 <Typography.Text type="secondary"> No answer</Typography.Text>
                         }
                     </Typography.Text>
+                    <Button shape="circle"  icon={<InfoCircleOutlined/>} type="text" onClick={() => setIsModalOpened(true)}></Button>
+                    </>
                 }>
                  
 

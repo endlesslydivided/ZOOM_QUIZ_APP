@@ -20,7 +20,22 @@ const RootElement = () =>
  
 
   return(
-      <Provider store={store}>   
+   
+      <Provider store={store}>  
+       <div className="area" >
+            <ul className="circles">
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+            </ul>
+      </div > 
         <BrowserRouter>
             <App/>
         </BrowserRouter>

@@ -3,17 +3,17 @@ import { BadRequestException, ExecutionContext, ForbiddenException, forwardRef, 
 import { Request } from 'express';
 
 @Injectable()
-export class ZoomContextGuard
+export class AccessTokenGuard
 {
   async canActivate(context: ExecutionContext): Promise<boolean>  
   {
     try 
     {
       const request: Request = context.switchToHttp().getRequest();
-      const zoomContext =request['zoomContext'];
-      if(!zoomContext)
+      const accessToken =request['accessToken'];
+      if(!accessToken)
       {
-        throw new BadRequestException("App isn't opened in ZOOM");
+        throw new ForbiddenException("User access forbidden. Access token is required");
       }
       return true
      

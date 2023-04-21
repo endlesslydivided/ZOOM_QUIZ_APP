@@ -1,4 +1,4 @@
-import { Inject, Injectable, InternalServerErrorException, forwardRef } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable, InternalServerErrorException, forwardRef } from '@nestjs/common';
 import { DataSource } from 'typeorm';
 import { CreatePlaySessionDTO } from './dto/CreatePlaySession';
 import { Quiz } from 'src/quizzes/quiz.entity';
@@ -28,6 +28,15 @@ export class PlaySessionsService {
             console.log(error);
             throw new InternalServerErrorException('Quiz isn`t found. Internal server error occure');
         });;
+
+        const playSessionCandidate = await this.dataSource.getRepository(PlaySession).findOne({
+            where:{quiz:{id:quiz.id},meetId:dto.meetId}
+        })
+
+        if(playSessionCandidate)
+        {
+            throw new BadRequestException('Quiz is already activated');
+        }
 
         const playSession = new PlaySession();
 
@@ -91,6 +100,22 @@ export class PlaySessionsService {
 
     async getPlaySessionReport(playSessionId:string,context:ZoomContext)
     {
-        const meetingUsers = await this.authService.apiRequest('GET',`/past_meetings/${playSessionId}/participants`,process.env.ZM_SECRET_TOKEN);
-        return meetingUsers;
+        const playSessionResults = await this.dataSource
+        .createQueryBuilder(PlaySession,"playSessions")
+        .leftJoinAndSelect("playSessions.results","result")
+        .leftJoinAndSelect("result.answer","answer")
+        .select([
+            `playSessions.id`, `playSessions.meetId`, `playSessions.createdAt`, 
+            `result.id`,`result.createdAt`,
+            `answer.id`,`answer.isCorrect`])
+        .where("playSessions.id = :playSessionId",{playSessionId: playSessionId})
+        .getOne()
+
+        const report = {
+            correctAnswersCount: playSessionResults.results.reduce((a,i) => i.answer.isCorrect ? ++a : a,0),
+            incorrectAnswersCount:playSessionResults.results.reduce((a,i) => i.answer.isCorrect ? a : ++a,0),
+            overallAnswersCount:playSessionResults.results.length
+        }
+
+        return report;
     }}

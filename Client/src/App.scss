@@ -66,3 +66,12 @@ body
     border-radius: 10px; z-index:100;
 }
 /*#endregion*/
+
+/*#region Fonts*/
+
+@font-face {
+    font-family: "Montserrat";
+    src: url("./assets/fonts/Montserrat/Montserrat-SemiBold.ttf") 
+    format("truetype");
+}
+/*#endregion*/

@@ -15,6 +15,8 @@ import { Quiz } from './quizzes/quiz.entity';
 import { QuizzesModule } from './quizzes/quizzes.module';
 import { Result } from './results/result.entity';
 import { ResultsModule } from './results/results.module';
+import { AccessTokenMiddleware } from './auth/middlewares/accessToken.middleware';
+import { RefreshTokenMiddleware } from './auth/middlewares/refreshToken.middleware';
 
 @Module({
   imports: [AuthModule,
@@ -48,8 +50,16 @@ import { ResultsModule } from './results/results.module';
 export class AppModule {
   configure(consumer: MiddlewareConsumer) {
     consumer
-      .apply(ZoomContextMiddleware)
-      .forRoutes('/','/context','/quizzes','/play-sessions','/play-quiz')
+    .apply(ZoomContextMiddleware)
+    .forRoutes('/','/context','/quizzes','/play-sessions','/play-quiz','/auth/me');
+
+    consumer
+      .apply(AccessTokenMiddleware)
+      .forRoutes('/auth/me')
+      
+    consumer
+    .apply(RefreshTokenMiddleware)
+    .forRoutes('/auth/refresh-token')
 
   }
 }

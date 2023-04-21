@@ -3,27 +3,26 @@ import { notification } from 'antd';
 import { useEffect } from 'react';
 import './App.scss';
 import AppRouter from './components/AppRouter';
-import { useLazyGetTokenQuery } from './services/AuthApiSlice';
+import { useLazyGetMeQuery, useLazyGetTokenQuery } from './services/AuthApiSlice';
 
 const codeChallenge =  "chbDH4tbSj1MZu6-aI-pWPpTnIYNa9lQp8FuFnqemJs";
 const state = "TIA5UgoMte";
 const base64URL = (s:any) => s.toString('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
 
-function App() {
+function App() 
+{
 
-  const [getToken] = useLazyGetTokenQuery();
-  
-  const configAuth = async () => {
-  
-    const result = await zoomSdk.config({capabilities: ["getRunningContext","getSupportedJsApis","openUrl","authorize","onAuthorized"]})
+    const [getToken] = useLazyGetTokenQuery();
+    const [getMe] = useLazyGetMeQuery();
 
-    notification.info({message:JSON.stringify(result)});
-    const challenge = base64URL(codeChallenge);
+    const configAuth = async () => 
+    {
+    
+      const result = await zoomSdk.config({capabilities: ["getRunningContext","getSupportedJsApis","openUrl","authorize","onAuthorized"]})
 
-    zoomSdk.addEventListener("onAuthorized", (event) =>{
-      notification.success({message:JSON.stringify(event)});
+      const challenge = base64URL(codeChallenge);
 
-
+      zoomSdk.addEventListener("onAuthorized", async (event) =>{
 
       const params =
       {
@@ -32,19 +31,16 @@ function App() {
         verifier:'ac3e722ede6ff88fac10cb6e02e2f63ab0acf08148f91b699988e097',
       }
 
-      getToken({params});
+      await getToken({params});
+      await getMe({});
 
     });
-    zoomSdk.authorize({
-      state,
-      codeChallenge:challenge,
-    })
-      .then((ret) => {
-        notification.success({message:JSON.stringify(ret)});
-      })
-      .catch((e) => {
-        notification.error({message:JSON.stringify(e)});
-      });
+
+    zoomSdk.authorize({state,codeChallenge:challenge})
+    .catch((e) => 
+    {
+      notification.error({message:'Some erro occured during ZoomSDK authorize. You better restart the app.'});
+    });
   }
 
   useEffect(()=>
