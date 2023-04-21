@@ -17,7 +17,6 @@ export class AppController {
     try
     {
       const context = req.header(contextHeader);
-      res.cookie("zoomContext",req['zoomContext'],{maxAge: 2147483647 , secure:true, sameSite:"lax"});
       res.redirect(process.env.REACT_APP_URI + `?context=${context}`);
     } 
     catch (e) 
