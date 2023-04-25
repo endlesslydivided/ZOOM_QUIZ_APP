@@ -1,10 +1,17 @@
 import { Answer } from 'src/answers/answer.entity';
 import { PlaySession } from 'src/play-sessions/playSession.entity';
-import { Column, CreateDateColumn, DeleteDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  DeleteDateColumn,
+  Entity,
+  OneToMany,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 
-@Entity({name:'quiz'})
+@Entity({ name: 'quiz' })
 export class Quiz {
-
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
@@ -14,26 +21,23 @@ export class Quiz {
   @Column()
   text: string;
 
-
-
-  @OneToMany(() => PlaySession,(session) => session.quiz, {
-    nullable:false,
-    createForeignKeyConstraints: true
-    })
+  @OneToMany(() => PlaySession, (session) => session.quiz, {
+    nullable: false,
+    createForeignKeyConstraints: true,
+  })
   playSessions: PlaySession[];
 
-  @OneToMany(() => Answer,(answer) => answer.quiz, {
-    createForeignKeyConstraints: true
-    })
+  @OneToMany(() => Answer, (answer) => answer.quiz, {
+    createForeignKeyConstraints: true,
+  })
   answers: Answer[];
 
-  @CreateDateColumn({name: 'createdAt'})
+  @CreateDateColumn({ name: 'createdAt' })
   createdAt: Date;
 
-  @UpdateDateColumn({name: 'updatedAt'})
+  @UpdateDateColumn({ name: 'updatedAt' })
   updatedAt: Date;
 
-  @DeleteDateColumn({name:'deletedAt'})
+  @DeleteDateColumn({ name: 'deletedAt' })
   deletedAt?: Date;
-
 }

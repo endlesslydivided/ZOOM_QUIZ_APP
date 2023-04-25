@@ -1,6 +1,14 @@
-import { Controller, Get, Query, Req, Res, Session, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Query,
+  Req,
+  Res,
+  Session,
+  UseGuards,
+} from '@nestjs/common';
 import { Request, Response } from 'express';
-import {Session  as ExpressSession} from 'express-session';
+import { Session as ExpressSession } from 'express-session';
 import { RedirectQuery } from './queryUtils/RedirectQuery';
 import { AuthService } from './auth.service';
 import { ZoomRefreshToken } from './decorators/refreshToken.decorator.';
@@ -10,52 +18,38 @@ import { ZoomAccessToken } from './decorators/accessToken.decorator';
 
 @Controller('auth')
 export class AuthController {
+  constructor(private authService: AuthService) {}
 
-    constructor(private authService: AuthService) {}
+  @Get()
+  async redirect(
+    @Query() code: string,
+    @Res() res: Response,
+    @Session() session: ExpressSession & { state: string; verifier: string },
+  ): Promise<void> {
+    const deeplink = await this.authService.getDeeplink(session, code);
+    res.redirect(deeplink);
+  }
 
+  @Get('/token')
+  async redirectClient(
+    @Query() { code, verifier }: { code: string; verifier: string },
+  ): Promise<Record<string, string>> {
+    return await this.authService.getToken(code, verifier, 'S256');
+  }
 
-    @Get()
-    async redirect(@Query() {code}:any ,@Res() res:Response, 
-    @Session() session:ExpressSession & {state:any,verifier:any})
-    {
-        session.state = null;
-        try 
-        {
-            
-            const verifier = session.verifier;
-            session.verifier = null;
-    
-            const { access_token: accessToken } = await this.authService.getToken(code, verifier,'S256');
-    
-            const deeplink = await this.authService.getDeeplink(accessToken);
-    
-            res.redirect(deeplink);
-        } 
-        catch (e) 
-        {
-            throw e;
-        }
-    }
+  @Get('/refresh-token')
+  async refreshToken(
+    @ZoomRefreshToken() token: string,
+  ): Promise<Record<string, string>> {
+    return await this.authService.refreshToken(token);
+  }
 
-    @Get('/token')
-    async redirectClient(@Query() {code,verifier}:any )
-    {
-        const tokens = await this.authService.getToken(code, verifier,'S256');
-        return tokens;
-    }
-
-    @Get('/refresh-token')
-    async refreshToken(@ZoomRefreshToken() token:string )
-    {
-        const tokens = await this.authService.refreshToken(token);
-        return tokens;
-    }
-
-    @UseGuards(AccessTokenGuard)
-    @Get('/me')
-    async getMe(@ZoomContext() zoomContext:any,@ZoomAccessToken() token: string)
-    {
-        const user = await this.authService.getMe(token);
-        return user;
-    }
+  @UseGuards(AccessTokenGuard)
+  @Get('/me')
+  async getMe(
+    @ZoomContext() zoomContext: ZoomContext,
+    @ZoomAccessToken() token: string,
+  ): Promise<Record<string, string>> {
+    return await this.authService.getMe(token);
+  }
 }

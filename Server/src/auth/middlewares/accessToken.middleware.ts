@@ -1,39 +1,36 @@
-import { forwardRef, HttpException, Inject, Injectable, InternalServerErrorException, NestMiddleware } from '@nestjs/common';
+import {
+  forwardRef,
+  HttpException,
+  Inject,
+  Injectable,
+  InternalServerErrorException,
+  NestMiddleware,
+} from '@nestjs/common';
 import { Request, Response, NextFunction } from 'express';
 import { contextHeader, getAppContext } from 'src/utils/cipher';
 
 @Injectable()
 export class AccessTokenMiddleware implements NestMiddleware {
+  private authHeader = 'Authorization';
 
-    private authHeader = 'Authorization';
+  async use(
+    req: Request & { accessToken?: string },
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      const accessTokenHeader: string = req.header(this.authHeader);
 
-    constructor() 
-    {
+      req['accessToken'] = null;
 
-    }
-
-    async use(req: Request, res: Response, next: NextFunction) 
-    {
-        try 
-        {
-            const accessTokenHeader = req.header(this.authHeader);
-            
-            req['accessToken'] = null;
-            
-            if(accessTokenHeader)
-            {
-                const accessTokenBearer = accessTokenHeader.split(' ');
-                if(accessTokenBearer[0] === 'Bearer')
-                {
-                    req['accessToken'] = accessTokenBearer[1];
-
-                }
-            }    
-            next();
-        } 
-        catch (e) 
-        {
-            next();
+      if (accessTokenHeader) {
+        const accessTokenBearer = accessTokenHeader.split(' ');
+        if (accessTokenBearer[0] === 'Bearer') {
+          req['accessToken'] = accessTokenBearer[1];
         }
-    } 
+      }
+      next();
+    } catch (e) {
+      next();
+    }
+  }
 }

@@ -19,47 +19,50 @@ import { AccessTokenMiddleware } from './auth/middlewares/accessToken.middleware
 import { RefreshTokenMiddleware } from './auth/middlewares/refreshToken.middleware';
 
 @Module({
-  imports: [AuthModule,
+  imports: [
+    AuthModule,
     ConfigModule.forRoot({
-      envFilePath:'.env'
+      envFilePath: '.env',
     }),
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'client'),
     }),
     TypeOrmModule.forRoot({
       type: 'postgres',
-      logging:true,
+      logging: true,
       host: process.env.POSTGRES_HOST,
       port: Number(process.env.POSTGRES_PORT),
       username: process.env.POSTGRES_USER,
       password: process.env.POSTGRES_PASSWORD,
       database: process.env.POSTGRES_DB,
-      entities: [Quiz,Answer,Result,PlaySession],
+      entities: [Quiz, Answer, Result, PlaySession],
       synchronize: true,
-      autoLoadEntities:true
+      autoLoadEntities: true,
     }),
     QuizzesModule,
     AnswersModule,
     ResultsModule,
     PlaySessionsModule,
-    AuthModule
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],
 })
 export class AppModule {
-  configure(consumer: MiddlewareConsumer) {
+  configure(consumer: MiddlewareConsumer): void {
     consumer
-    .apply(ZoomContextMiddleware)
-    .forRoutes('/','/context','/quizzes','/play-sessions','/play-quiz','/auth/me');
+      .apply(ZoomContextMiddleware)
+      .forRoutes(
+        '/',
+        '/context',
+        '/quizzes',
+        '/play-sessions',
+        '/play-quiz',
+        '/auth/me',
+      );
 
-    consumer
-      .apply(AccessTokenMiddleware)
-      .forRoutes('/auth/me')
-      
-    consumer
-    .apply(RefreshTokenMiddleware)
-    .forRoutes('/auth/refresh-token')
+    consumer.apply(AccessTokenMiddleware).forRoutes('/auth/me');
 
+    consumer.apply(RefreshTokenMiddleware).forRoutes('/auth/refresh-token');
   }
 }

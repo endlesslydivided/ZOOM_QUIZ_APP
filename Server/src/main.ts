@@ -1,75 +1,72 @@
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
-import axios from 'axios';
+import { NestExpressApplication } from '@nestjs/platform-express';
+import axios, { AxiosResponse, InternalAxiosRequestConfig } from 'axios';
 import * as compression from 'compression';
 import * as cookieParser from 'cookie-parser';
 import debug from 'debug';
-import express from 'express';
 import * as session from 'express-session';
 import helmet from 'helmet';
-import { dirname } from 'path';
-import { fileURLToPath, URL } from 'url';
+import { URL } from 'url';
 import { AppModule } from './app.module';
 import { AllExceptionFilter } from './exception/AllException.filter';
 import { ValidationExceptionFactory } from './validation/validation.exceptionFactory';
-import { NestExpressApplication } from '@nestjs/platform-express';
-import {AbortController} from "node-abort-controller";
 
-
-
-
-async function bootstrap() {
-  const app = await NestFactory.create<NestExpressApplication>(AppModule,{rawBody:true});
+const bootstrap = async (): Promise<void> => {
+  const app = await NestFactory.create<NestExpressApplication>(AppModule, {
+    rawBody: true,
+  });
 
   const viewDir = `${__dirname}/server/views`;
 
   app.enableCors({
-    origin:  true,
+    origin: true,
     credentials: true,
-    methods: "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS",
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     preflightContinue: false,
-    optionsSuccessStatus: 204
+    optionsSuccessStatus: 204,
   });
-  
+
   app.set('view engine', 'pug');
   app.set('views', viewDir);
 
-  const appName =process.env.APP_NAME;
- 
+  const appName = process.env.APP_NAME;
 
-  const redirectHost = new URL(process.env.ZM_REDIRECT_URL).host;
-  const logFunc = (r) => {
-      if (process.env.NODE_ENV !== 'production') {
-          let { method, status, url, baseURL, config } = r;
+  const redirectHost: string = new URL(process.env.ZM_REDIRECT_URL).host;
+  const logFunc = (
+    r: InternalAxiosRequestConfig & AxiosResponse,
+  ): InternalAxiosRequestConfig & AxiosResponse => {
+    if (process.env.NODE_ENV !== 'production') {
+      const { method, status, url, baseURL, config } = r;
 
-          const endp = url || config?.url;
-          const base = baseURL || config?.baseURL;
-          let str = new URL(endp, base).href;
+      const endp = url || config?.url;
+      const base = baseURL || config?.baseURL;
+      let str = new URL(endp, base).href;
 
-          if (method) str = `${method.toUpperCase()} ${str}`;
-          if (status) str = `${status} ${str}`;
+      if (method) str = `${method.toUpperCase()} ${str}`;
+      if (status) str = `${status} ${str}`;
 
-          debug(`${appName}:axios`)(str);
-      }
+      debug(`${appName}:axios`)(str);
+    }
 
-      return r;
+    return r;
   };
 
   axios.interceptors.request.use(logFunc);
   axios.interceptors.response.use(logFunc);
-  
 
-  app.use(helmet({
-    frameguard: {
-      action: 'sameorigin',
-    },
-    hsts: {
+  app.use(
+    helmet({
+      frameguard: {
+        action: 'sameorigin',
+      },
+      hsts: {
         maxAge: 31536000,
-    },
-    referrerPolicy: {policy:"same-origin"},
-    crossOriginEmbedderPolicy: false,
-    contentSecurityPolicy: {
-      directives: {
+      },
+      referrerPolicy: { policy: 'same-origin' },
+      crossOriginEmbedderPolicy: false,
+      contentSecurityPolicy: {
+        directives: {
           'default-src': 'self',
           styleSrc: ["'self'"],
           scriptSrc: ["'self'", 'https://appssdk.zoom.us/sdk.min.js'],
@@ -77,9 +74,10 @@ async function bootstrap() {
           'connect-src': 'self',
           'base-uri': 'self',
           'form-action': 'self',
+        },
       },
-  },
-  }));
+    }),
+  );
 
   app.useBodyParser('json', { limit: '10mb' });
   app.use(compression());
@@ -90,23 +88,22 @@ async function bootstrap() {
       secret: [process.env.SESSION_SECRET],
       resave: false,
       saveUninitialized: false,
-      cookie:
-      {
+      cookie: {
         maxAge: 24 * 60 * 60 * 1000,
-        httpOnly:true,
-        secure:  process.env.NODE_ENV === 'production'
-      }
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+      },
     }),
   );
 
   app.useGlobalFilters(new AllExceptionFilter());
-  app.useGlobalPipes(new ValidationPipe(
-    { 
+  app.useGlobalPipes(
+    new ValidationPipe({
       transform: true,
-      exceptionFactory: ValidationExceptionFactory
-    }));
-  
-  
-  await app.listen( process.env.PORT || 3001);
-}
+      exceptionFactory: ValidationExceptionFactory,
+    }),
+  );
+
+  await app.listen(process.env.PORT || 3001);
+};
 bootstrap();

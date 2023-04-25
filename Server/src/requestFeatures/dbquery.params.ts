@@ -1,7 +1,5 @@
-export default class DBQueryParameters
-{
-    public limit?:number;
+export default class DBQueryParameters {
+  public limit?: number;
 
-    public offset?:number;
-
+  public offset?: number;
 }

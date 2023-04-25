@@ -1,11 +1,16 @@
 import { Quiz } from 'src/quizzes/quiz.entity';
 import { Result } from 'src/results/result.entity';
-import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
-@Entity({name:'answer'})
+@Entity({ name: 'answer' })
 export class Answer {
-  
-
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
@@ -15,17 +20,12 @@ export class Answer {
   @Column({ default: false })
   isCorrect: boolean;
 
-
-  @OneToMany(() => Result,(result) => result.answer, {
-    nullable:true
-    })
+  @OneToMany(() => Result, (result) => result.answer, {
+    nullable: true,
+  })
   results: Result[];
 
-  @ManyToOne(() => Quiz,(quiz) => quiz.answers)
-  @JoinColumn({name:'quizId',referencedColumnName:'id'}) 
+  @ManyToOne(() => Quiz, (quiz) => quiz.answers)
+  @JoinColumn({ name: 'quizId', referencedColumnName: 'id' })
   quiz: Quiz;
-
- 
-
-
 }
