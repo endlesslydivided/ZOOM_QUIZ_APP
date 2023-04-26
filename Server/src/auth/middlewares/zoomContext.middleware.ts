@@ -1,13 +1,9 @@
 import {
-  forwardRef,
-  HttpException,
-  Inject,
   Injectable,
-  InternalServerErrorException,
-  NestMiddleware,
+  NestMiddleware
 } from '@nestjs/common';
-import { Request, Response, NextFunction } from 'express';
-import { contextHeader, getAppContext } from 'src/utils/cipher';
+import { NextFunction, Request } from 'express';
+import { contextHeader, getAppContext } from '../../utils/cipher';
 import { ZoomContext } from '../decorators/zoomContext.decorator';
 
 @Injectable()

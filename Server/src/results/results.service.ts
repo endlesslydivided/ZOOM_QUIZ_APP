@@ -1,9 +1,9 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { DataSource, QueryRunner, TypeORMError } from 'typeorm';
 import { CreateResultDTO } from './dto/CreateResult.dto';
-import { PlaySession } from 'src/play-sessions/playSession.entity';
+import { PlaySession } from '../play-sessions/playSession.entity';
 import { Result } from './result.entity';
-import { Answer } from 'src/answers/answer.entity';
+import { Answer } from '../answers/answer.entity';
 
 @Injectable()
 export class ResultsService {

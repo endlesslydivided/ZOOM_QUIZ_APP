@@ -3,9 +3,9 @@ import {
   Injectable,
   InternalServerErrorException
 } from '@nestjs/common';
-import { ZoomContext } from 'src/auth/decorators/zoomContext.decorator';
-import { Quiz } from 'src/quizzes/quiz.entity';
-import DBQueryParameters from 'src/requestFeatures/dbquery.params';
+import { ZoomContext } from '../auth/decorators/zoomContext.decorator';
+import { Quiz } from '../quizzes/quiz.entity';
+import DBQueryParameters from '../requestFeatures/dbquery.params';
 import { DataSource, QueryRunner, TypeORMError } from 'typeorm';
 import { CreatePlaySessionDTO } from './dto/CreatePlaySession';
 import { Report } from './interfaces/interfaces';
@@ -19,19 +19,14 @@ export class PlaySessionsService {
 
   async createPlaySession(dto: CreatePlaySessionDTO): Promise<PlaySession> {
     const queryRunner: QueryRunner = this.dataSource.createQueryRunner();
-
+    
     await queryRunner.connect();
     await queryRunner.startTransaction();
 
     const quiz: Quiz = await this.dataSource
       .getRepository(Quiz)
       .findOne({ where: { id: dto.quizId }, relations: ['answers'] })
-      .catch((error: TypeORMError) => {
-        console.log(error);
-        throw new InternalServerErrorException(
-          'Quiz isn`t found. Internal server error occure',
-        );
-      });
+      
 
     const playSessionCandidate: PlaySession = await this.dataSource
       .getRepository(PlaySession)
@@ -141,7 +136,6 @@ export class PlaySessionsService {
 
   async getPlaySessionReport(
     playSessionId: string,
-    context: ZoomContext,
   ): Promise<Report> {
     const playSessionResults: PlaySession = await this.dataSource
       .createQueryBuilder(PlaySession, 'playSessions')

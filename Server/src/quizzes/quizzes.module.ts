@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
-import { AnswersModule } from 'src/answers/answers.module';
-import { PlaySessionsModule } from 'src/play-sessions/play-sessions.module';
-import { ResultsModule } from 'src/results/results.module';
+import { AnswersModule } from '../answers/answers.module';
+import { PlaySessionsModule } from '../play-sessions/play-sessions.module';
+import { ResultsModule } from '../results/results.module';
 import { QuizzesController } from './quizzes.controller';
 import { QuizGateway } from './quizzes.gateway';
 import { QuizzesService } from './quizzes.service';

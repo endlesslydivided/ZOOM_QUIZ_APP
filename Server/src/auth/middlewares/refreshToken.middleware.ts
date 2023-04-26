@@ -1,13 +1,8 @@
 import {
-  forwardRef,
-  HttpException,
-  Inject,
   Injectable,
-  InternalServerErrorException,
-  NestMiddleware,
+  NestMiddleware
 } from '@nestjs/common';
-import { Request, Response, NextFunction } from 'express';
-import { contextHeader, getAppContext } from 'src/utils/cipher';
+import { NextFunction, Request, Response } from 'express';
 
 @Injectable()
 export class RefreshTokenMiddleware implements NestMiddleware {

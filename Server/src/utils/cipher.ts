@@ -1,6 +1,6 @@
 import * as crypto from 'crypto';
 import createError from 'http-errors';
-import { ZoomContext } from 'src/auth/decorators/zoomContext.decorator';
+import { ZoomContext } from '../auth/decorators/zoomContext.decorator';
 
 const unpack = (
   ctx: string,

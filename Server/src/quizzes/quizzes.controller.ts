@@ -9,11 +9,11 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { QuizzesService } from './quizzes.service';
-import { ZoomContextGuard } from 'src/auth/guards/zoomContext.guard';
+import { ZoomContextGuard } from '../auth/guards/zoomContext.guard';
 import { CreateQuizDTO } from './dto/createQuiz.dto';
-import { ZoomContext } from 'src/auth/decorators/zoomContext.decorator';
-import { QueryParamsPipe } from 'src/requestFeatures/queryParams.pipe';
-import QueryParameters from 'src/requestFeatures/query.params';
+import { ZoomContext } from '../auth/decorators/zoomContext.decorator';
+import { QueryParamsPipe } from '../requestFeatures/queryParams.pipe';
+import QueryParameters from '../requestFeatures/query.params';
 import { Quiz } from './quiz.entity';
 import { UpdateResult } from 'typeorm';
 

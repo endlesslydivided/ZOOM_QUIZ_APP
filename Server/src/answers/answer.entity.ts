@@ -1,5 +1,5 @@
-import { Quiz } from 'src/quizzes/quiz.entity';
-import { Result } from 'src/results/result.entity';
+import { Quiz } from '../quizzes/quiz.entity';
+import { Result } from '../results/result.entity';
 import {
   Column,
   Entity,

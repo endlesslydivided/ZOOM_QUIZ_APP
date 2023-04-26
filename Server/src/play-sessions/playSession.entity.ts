@@ -1,4 +1,4 @@
-import { Result } from 'src/results/result.entity';
+import { Result } from '../results/result.entity';
 import {
   Column,
   CreateDateColumn,

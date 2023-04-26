@@ -1,7 +1,7 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
-import { Answer } from 'src/answers/answer.entity';
-import { ZoomContext } from 'src/auth/decorators/zoomContext.decorator';
-import DBQueryParameters from 'src/requestFeatures/dbquery.params';
+import { Answer } from '../answers/answer.entity';
+import { ZoomContext } from '../auth/decorators/zoomContext.decorator';
+import DBQueryParameters from '../requestFeatures/dbquery.params';
 import {
   DataSource,
   QueryRunner,

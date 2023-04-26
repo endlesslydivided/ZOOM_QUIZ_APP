@@ -1,5 +1,5 @@
-import { Answer } from 'src/answers/answer.entity';
-import { PlaySession } from 'src/play-sessions/playSession.entity';
+import { Answer } from '../answers/answer.entity';
+import { PlaySession } from '../play-sessions/playSession.entity';
 import {
   Column,
   CreateDateColumn,

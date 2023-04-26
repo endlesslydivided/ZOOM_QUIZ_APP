@@ -1,12 +1,6 @@
 import {
-  IsArray,
-  IsBoolean,
-  IsEmail,
-  IsOptional,
-  IsString,
-  Length,
+  IsString
 } from 'class-validator';
-import { CreateAnswerDTO } from 'src/answers/dto/createAnswer.dto';
 
 export class CreatePlaySessionDTO {
   @IsString({ message: 'Must be a string' })

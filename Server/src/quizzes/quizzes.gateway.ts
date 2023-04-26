@@ -11,17 +11,17 @@ import {
 import { Server, Socket } from 'socket.io';
 
 import { ConnectedSocket } from '@nestjs/websockets';
-import { ZoomContextGuard } from 'src/auth/guards/zoomContext.guard';
-import { CreatePlaySessionDTO } from 'src/play-sessions/dto/CreatePlaySession';
-import { PlaySessionsService } from 'src/play-sessions/play-sessions.service';
-import { CreateResultDTO } from 'src/results/dto/CreateResult.dto';
-import { ResultsService } from 'src/results/results.service';
-import { getAppContext } from 'src/utils/cipher';
+import { ZoomContextGuard } from '../auth/guards/zoomContext.guard';
+import { CreatePlaySessionDTO } from '../play-sessions/dto/CreatePlaySession';
+import { PlaySessionsService } from '../play-sessions/play-sessions.service';
+import { CreateResultDTO } from '../results/dto/CreateResult.dto';
+import { ResultsService } from '../results/results.service';
+import { getAppContext } from '../utils/cipher';
 import { QuizzesService } from './quizzes.service';
-import { ZoomContext } from 'src/auth/decorators/zoomContext.decorator';
-import { Result } from 'src/results/result.entity';
-import { Answer } from 'src/answers/answer.entity';
-import { PlaySession } from 'src/play-sessions/playSession.entity';
+import { ZoomContext } from '../auth/decorators/zoomContext.decorator';
+import { Result } from '../results/result.entity';
+import { Answer } from '../answers/answer.entity';
+import { PlaySession } from '../play-sessions/playSession.entity';
 
 export enum QuizClientEvent {
   SERVER_SENDS_ANSWERS = 'SERVER_SENDS_ANSWER',
