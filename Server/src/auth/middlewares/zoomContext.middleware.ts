@@ -2,7 +2,7 @@ import {
   Injectable,
   NestMiddleware
 } from '@nestjs/common';
-import { NextFunction, Request } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import { contextHeader, getAppContext } from '../../utils/cipher';
 import { ZoomContext } from '../decorators/zoomContext.decorator';
 
@@ -10,7 +10,8 @@ import { ZoomContext } from '../decorators/zoomContext.decorator';
 export class ZoomContextMiddleware implements NestMiddleware {
   async use(
     req: Request & { zoomContext?: ZoomContext },
-    next: NextFunction,
+    res: Response, 
+    next: NextFunction
   ): Promise<void> {
     try {
       const header = req.header(contextHeader);

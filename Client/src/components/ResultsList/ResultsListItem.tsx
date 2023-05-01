@@ -1,28 +1,28 @@
-import { Button, Card, Collapse, List, Typography } from "antd";
-import './ResultsList.scss';
+import { InfoCircleOutlined } from "@ant-design/icons";
+import { Button, Card, List, Typography } from "antd";
 import { useState } from "react";
 import QuizStatsModal from "../QuizList/QuizStatsModal";
-import { InfoCircleOutlined } from "@ant-design/icons";
+import './ResultsList.scss';
+import { Answer } from "../../types/entityTypes";
+import { UserPlaySessionResult } from "../../types/storeSliceTypes";
 
 interface ResultsItemProps
 {
-    result:any;
+    result:UserPlaySessionResult;
 }
 
 const ResultsItem:React.FC<ResultsItemProps>= ({result}) =>
 {
-
     const isResult = !!result.results && result.results?.length !== 0;
 
-    const userAnswerId = isResult && result.results[0].answer?.id;
+    const userAnswerId = isResult && result.results![0].answer?.id;
 
-    const isCorrect = isResult && result?.quiz?.answers?.find((a:any) => a.id === userAnswerId).isCorrect;
+    const isCorrect = isResult && result?.quiz?.answers?.find((a:any) => a.id === userAnswerId)?.isCorrect;
     
     const yourAnswerText = isResult ? isCorrect ? " Correct!" : " Incorrect(" : " No answer";
     const yourAnswerStyle = isResult ? {color:isCorrect?'rgba(9, 208, 59, 0.771)' : 'rgba(214, 80, 80, 0.633)'} : {};
     
     const [isModalOpened,setIsModalOpened] = useState(false);
-
 
     return (
         <List.Item>
@@ -51,30 +51,26 @@ const ResultsItem:React.FC<ResultsItemProps>= ({result}) =>
                     <Button shape="circle"  icon={<InfoCircleOutlined/>} type="text" onClick={() => setIsModalOpened(true)}></Button>
                     </>
                 }>
-                 
-
                     {
-                        result.quiz.answers?.map((answer:any) =><ResultsAnswerItem answer={answer} result={result}/>)
+                        result.quiz.answers?.map((answer:Answer) =><ResultsAnswerItem key={answer.id} answer={answer} result={result}/>)
                     }
             </Card>
-
         </List.Item>
     )
 }
 
 
-const ResultsAnswerItem = ({answer,result}:any) =>
+const ResultsAnswerItem = ({answer,result}:{answer:Answer,result:UserPlaySessionResult}) =>
 {
 
     const isResult = !!result.results && result.results?.length !== 0;
 
-    const isUserAnswer =isResult && result.results[0]?.answer?.id === answer.id;
+    const isUserAnswer =isResult && result.results![0].answer?.id === answer.id;
 
-    const isCorrectAnswer = isResult && result?.quiz?.answers?.find((a:any) => a.id === answer.id).isCorrect;
+    const isCorrectAnswer = isResult && result?.quiz?.answers?.find((a:Answer) => a.id === answer.id)?.isCorrect;
     const resultClass =   isCorrectAnswer ?"correct-answer" : "wrong-answer";
 
     const answerClasses = `answer-text ${isUserAnswer ? "user-answer" : ""} ${isResult ? resultClass : ""}`;
-
 
     return (
         <Card className={answerClasses}>

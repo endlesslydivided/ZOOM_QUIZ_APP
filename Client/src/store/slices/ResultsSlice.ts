@@ -1,39 +1,40 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { Slice, createSlice } from "@reduxjs/toolkit";
+import { UserPlaySessionResult } from "../../types/storeSliceTypes";
 
 
-export const resultsSlice: any = createSlice({
-  initialState: <any>[],
+export const resultsSlice: Slice<UserPlaySessionResult[]> = createSlice({
+  initialState: Array<UserPlaySessionResult>,
   name: "resultsSlice",
   reducers: {
-    setResults: (state: any, action) => {
-      const results = action.payload;
+    setResults: (state, action) => {
+      const results:UserPlaySessionResult[] = action.payload;
       return [...results];
     },
-    appendResult: (state: any, action) => {
-      const data = action.payload;
+    appendResult: (state, action) => {
+      const data:UserPlaySessionResult = action.payload;
       return [data, ...state];
     },
-    appendResults: (state: any, action) => {
-      const data = action.payload;
+    appendResults: (state, action) => {
+      const data:UserPlaySessionResult[] = action.payload;
       return [...data, ...state];
     },
-    deleteResult: (state: any, action) => {
-      const id = action.payload;
-      return [...state.filter((i: any) => i.id !== id)];
+    deleteResult: (state, action) => {
+      const id:string = action.payload;
+      return [...state.filter((i:UserPlaySessionResult) => i.id !== id)];
     },
 
-    appendPage:(state:any,action:any) =>
+    appendPage:(state,action) =>
     {
-      const data = action.payload;
-      const retrievedResults = data.filter((c:any) => !state?.includes(c));
+      const data:UserPlaySessionResult[] = action.payload;
+      const retrievedResults:UserPlaySessionResult[] = data.filter((c:UserPlaySessionResult) => !state?.includes(c));
 
-      const editedResults = retrievedResults.filter((r:any) => state?.some((c:any) => c.id === r.id));
+      const editedResults:UserPlaySessionResult[] = retrievedResults.filter((r:UserPlaySessionResult) => state?.some((c:UserPlaySessionResult) => c.id === r.id));
 
-      const newResults = retrievedResults.filter((c:any) => !state?.some((r:any) => c.id === r.id));
+      const newResults:UserPlaySessionResult[] = retrievedResults.filter((c:UserPlaySessionResult) => !state?.some((r:UserPlaySessionResult) => c.id === r.id));
 
-      const appliedResults = [...state?.map((c:any) => editedResults.map((e:any) => c.id === e.id ? e : c)[0] || c)];
+      const appliedResults:UserPlaySessionResult[] = [...state!.map((c:UserPlaySessionResult) => editedResults.map((e:UserPlaySessionResult) => c.id === e.id ? e : c)[0] || c)];
 
-      const finalList = appliedResults ? [...appliedResults,...newResults]: [...newResults];
+      const finalList:UserPlaySessionResult[] = appliedResults ? [...appliedResults,...newResults]: [...newResults];
 
       return finalList;
     },

@@ -1,26 +1,26 @@
-import { Col, Empty, Form, List, Modal, Row, Select, Statistic, Typography, notification } from 'antd';
+import { Col, Empty, Form, Modal, Row, Select, Statistic, Typography, notification } from 'antd';
 import dayjs from 'dayjs';
-import React, { useState } from 'react';
-import { useAppDispatch } from '../../hooks/redux';
+import React, { Dispatch, SetStateAction, useState } from 'react';
 import { useLazyGetPlaySessionReportQuery } from '../../services/PlaySessionsApiSlice';
+import { PlaySession } from '../../types/entityTypes';
+import { UserPlaySession } from '../../types/storeSliceTypes';
 
 
 interface QuizStatsModalProps
 {
     isModalOpened: boolean;
-    setIsModalOpened:Function;
-    playSessions:any;
+    setIsModalOpened:Dispatch<SetStateAction<boolean>>;
+    playSessions:PlaySession[] | UserPlaySession[];
 }
 
 const QuizStatsModal:React.FC<QuizStatsModalProps> = ({isModalOpened,setIsModalOpened,playSessions}) => {
 
-    const dispatch = useAppDispatch();
     const [report,setReport]:any = useState(null);
     const [getReport] = useLazyGetPlaySessionReportQuery();
 
     const onChangeSelect = async (value:any) =>
     {
-        const {data,error} = await getReport({psId:value})
+        const {data} = await getReport({psId:value})
 
         if(data)
         {
@@ -50,7 +50,7 @@ const QuizStatsModal:React.FC<QuizStatsModalProps> = ({isModalOpened,setIsModalO
                         <Select 
                             onChange={onChangeSelect} 
                             placeholder={<Typography.Text type='secondary'>Choose date</Typography.Text>}>
-                            {playSessions?.map((p:any)=> <Select.Option value={p.id}>{dayjs(p.createdAt).format('DD/MM/YYYY HH:mm:ss')}</Select.Option>)}
+                            {playSessions?.map((p)=> <Select.Option key={p.id} value={p.id}>{dayjs(p.createdAt).format('DD/MM/YYYY HH:mm:ss')}</Select.Option>)}
                         </Select>
                     </Form.Item>
                 </Form>

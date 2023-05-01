@@ -1,14 +1,14 @@
 import { Col, notification, Row, Typography } from 'antd';
 import React, { createContext, useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
-
 import { useNavigate } from 'react-router-dom';
 import { useAppSelector } from '../../hooks/redux';
 import {  appendPlaySession, updateResultPlaySession } from '../../store/slices/PlaySessionsSlice';
 import { ANSWER_ROUTE } from '../../utils/consts';
 import './SocketProvider.scss';
+import { RootState } from '../../store/store';
 
-const io:any = require('socket.io-client');
+const io = require('socket.io-client');
 
 export enum QuizClientEvent 
 {
@@ -31,7 +31,7 @@ export const SocketContext:any = createContext(null);
 
 export const SocketProvider:React.FC<SocketProviderProps> = ({children}) => {
 
-    const context = useAppSelector((state:any) => state.zoomContext.context);
+    const context = useAppSelector((state:RootState) => state.zoomContext.context);
 
     const navigate = useNavigate();
     const dispatch = useDispatch();

@@ -1,4 +1,4 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
 import axios from 'axios';
 import { URL } from 'url';
 import { Session as ExpressSession } from 'express-session';
@@ -26,7 +26,7 @@ export class AuthService {
 
     return axios({
       data: new URLSearchParams(params).toString(),
-      baseURL: this.host.host,
+      baseURL: this.host.href,
       url: '/oauth/token',
       method: 'POST',
       headers: {
@@ -40,7 +40,10 @@ export class AuthService {
       .then(({ data }) => {
         return Promise.resolve(data);
       })
-      .catch((error) => console.log(error));
+      .catch((error) => {
+        console.log(error);
+        throw new BadRequestException(error)
+      });
   }
 
   async apiRequest(
@@ -61,7 +64,10 @@ export class AuthService {
       .then(({ data }) => {
         return Promise.resolve(data);
       })
-      .catch((error) => console.log(error));
+      .catch((error) => {
+        console.log(error);
+        throw new BadRequestException(error)
+      });
   }
 
   async getToken(

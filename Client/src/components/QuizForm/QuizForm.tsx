@@ -1,15 +1,14 @@
-import React, { useState } from 'react';
-import { MinusCircleOutlined, PlusOutlined } from '@ant-design/icons';
-import { Button, Checkbox, Col,  Form, Input, Modal, Radio, Row, Space, notification } from 'antd';
-import { useCreateQuizMutation } from '../../services/QuizzesApiSlice';
+import { Button, Col, Form, Input, Modal, Radio, Row, notification } from 'antd';
+import React from 'react';
 import { useAppDispatch } from '../../hooks/redux';
+import { useCreateQuizMutation } from '../../services/QuizzesApiSlice';
 import { appendQuiz } from '../../store/slices/QuizzesSlice';
 
 
 interface QuizFormProps
 {
   isFormOpened: boolean;
-  setIsFormOpened:Function;
+  setIsFormOpened:(arg0:boolean) => void;
 }
 
 const QuizForm:React.FC<QuizFormProps> = ({isFormOpened,setIsFormOpened}) => {
@@ -17,9 +16,9 @@ const QuizForm:React.FC<QuizFormProps> = ({isFormOpened,setIsFormOpened}) => {
     const [createQuiz] = useCreateQuizMutation();
     const dispatch = useAppDispatch();
     
-    const onFinish = async (values: any) => 
+    const onFinish = async (values:any) => 
     {
-      let body:any = {text:values.text,answers:[]}; 
+      const body:any = {text:values.text,answers:[]}; 
       for (const property in values) 
       {
         if(property.match(/answers/g))
@@ -41,10 +40,6 @@ const QuizForm:React.FC<QuizFormProps> = ({isFormOpened,setIsFormOpened}) => {
         notification.error({message:error.data.message,placement:"topRight",duration:2});
       }
     };
-
-   
-
-
 
   return (
     <Modal

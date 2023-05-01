@@ -1,8 +1,8 @@
-FROM node:14.17-alpine
+FROM node:20-alpine
 
-WORKDIR /app
+WORKDIR /Client
 
-COPY package*.json ./
+COPY package*.json .
 
 RUN npm ci
 

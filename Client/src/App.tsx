@@ -32,7 +32,7 @@ function App()
       }
 
       await getToken({params});
-      await getMe({});
+      await getMe(null);
 
     });
 

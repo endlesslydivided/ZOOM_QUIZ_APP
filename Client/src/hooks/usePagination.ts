@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useAppDispatch } from "./redux";
 import { useNotify } from "./useNotify";
 import { notification } from "antd";
+import { Filters } from "../types/serviceSliceTypes";
 
 interface usePagintaionParams
 {
@@ -13,7 +14,7 @@ interface usePagintaionParams
     filtersParams?:any;
 }
 
-const initialFilters = {
+const initialFilters:Filters = {
     page: 1,
     limit: 5,
 };

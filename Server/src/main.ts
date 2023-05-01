@@ -40,8 +40,7 @@ const bootstrap = async (): Promise<void> => {
       const { method, status, url, baseURL, config } = r;
 
       const endp = url || config?.url;
-      const base = baseURL || config?.baseURL;
-      let str = new URL(endp, base).href;
+      let str = endp;
 
       if (method) str = `${method.toUpperCase()} ${str}`;
       if (status) str = `${status} ${str}`;

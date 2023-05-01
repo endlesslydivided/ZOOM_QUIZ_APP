@@ -2,7 +2,7 @@ import {
   Injectable,
   NestMiddleware
 } from '@nestjs/common';
-import { NextFunction, Request } from 'express';
+import { NextFunction, Request, Response } from 'express';
 
 @Injectable()
 export class AccessTokenMiddleware implements NestMiddleware {
@@ -10,7 +10,8 @@ export class AccessTokenMiddleware implements NestMiddleware {
 
   async use(
     req: Request & { accessToken?: string },
-    next: NextFunction,
+    res: Response, 
+    next:any,
   ): Promise<void> {
     try {
       const accessTokenHeader: string = req.header(this.authHeader);

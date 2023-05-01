@@ -1,17 +1,16 @@
-import { Button, Card, Collapse, List, Modal, Pagination, PaginationProps, Space, Tooltip, Typography, notification } from "antd";
-import { useDispatch } from "react-redux";
+import { PlusOutlined } from "@ant-design/icons";
+import { Button, List, Pagination, PaginationProps, Space, Typography } from "antd";
+import { useState } from "react";
 import { useAppSelector } from "../../hooks/redux";
-import { useNotify } from "../../hooks/useNotify";
+import { usePagination } from "../../hooks/usePagination";
 import { useGetUserQuizzesQuery } from "../../services/QuizzesApiSlice";
 import { setQuizzes } from "../../store/slices/QuizzesSlice";
-import { CloseOutlined, PlusOutlined, SendOutlined } from "@ant-design/icons";
-import QuizForm from "../QuizForm/QuizForm";
-import { useContext, useEffect, useState } from "react";
-import './QuizList.scss'
-import { QuizServerEvent, SocketContext } from "../SocketProvider/SocketProvider";
 import { RootState } from "../../store/store";
+import QuizForm from "../QuizForm/QuizForm";
+import './QuizList.scss';
 import QuizListItem from "./QuizListItem";
-import { usePagination } from "../../hooks/usePagination";
+import React from 'react';
+import { UserQuiz } from "../../types/storeSliceTypes";
 
 interface QuizListProps
 {
@@ -22,7 +21,7 @@ interface QuizListProps
 
 const QuizList:React.FC<QuizListProps> = () =>
 {
-    const quizzes:any = useAppSelector((state:any) => state.quizzes);
+    const quizzes:UserQuiz[] = useAppSelector((state:RootState) => state.quizzes);
 
     const [isFormOpened, setIsFormOpened] = useState(false);
     const {setFilters,filters,pagesCount,getContentResult} = usePagination(
@@ -54,7 +53,7 @@ const QuizList:React.FC<QuizListProps> = () =>
                 grid={{gutter:10,column:1}}
                 size={"small"} 
                 dataSource={quizzes}
-                renderItem={(quiz:any) => <QuizListItem quiz={quiz}/>}/>
+                renderItem={(quiz:UserQuiz) => <QuizListItem quiz={quiz}/>}/>
             <Pagination current={filters.page} defaultPageSize={filters.limit} total={pagesCount} onChange={onChangePage}/>
         </Space>
     )

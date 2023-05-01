@@ -3,7 +3,7 @@ import { useEffect } from "react";
 
 export const useNotify = (
     {result,successMessage,successCB,errorMessage,errorCB}:
-    {result: any,successMessage?:string,successCB?:Function,errorMessage?:string,errorCB?:Function}) => {
+    {result: any,successMessage?:string,successCB?:(...args:any[]) => void,errorMessage?:string,errorCB?:(...args:any[]) => void}) => {
 
     useEffect(() =>{
         if (result.isSuccess && !result.isFetching) 

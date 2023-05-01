@@ -6,7 +6,7 @@ import {
   IsString,
   Length,
 } from 'class-validator';
-import { CreateAnswerDTO } from '../answers/dto/createAnswer.dto';
+import { CreateAnswerDTO } from '../../answers/dto/createAnswer.dto';
 
 export class CreateQuizDTO {
   @IsString({ message: 'Must be a string' })

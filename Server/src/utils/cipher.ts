@@ -1,71 +1,66 @@
 import * as crypto from 'crypto';
 import createError from 'http-errors';
-import { ZoomContext } from '../auth/decorators/zoomContext.decorator';
 
-const unpack = (
-  ctx: string,
-): { iv: Buffer; aad: Buffer; cipherText: string; tag: Buffer } => {
-  let buf = Buffer.from(ctx, 'base64');
 
-  const ivLength = buf.readUInt8();
-  buf = buf.slice(1);
+const unpack = (ctx:string) => {
+    let buf = Buffer.from(ctx, 'base64');
 
-  const iv = buf.slice(0, ivLength);
-  buf = buf.slice(ivLength);
+    const ivLength = buf.readUInt8();
+    buf = buf.slice(1);
 
-  const aadLength = buf.readUInt16LE();
-  buf = buf.slice(2);
+    const iv = buf.slice(0, ivLength);
+    buf = buf.slice(ivLength);
 
-  const aad = buf.slice(0, aadLength);
-  buf = buf.slice(aadLength);
+    const aadLength = buf.readUInt16LE();
+    buf = buf.slice(2);
 
-  const cipherLength = buf.readInt32LE();
-  buf = buf.slice(4);
+    const aad = buf.slice(0, aadLength);
+    buf = buf.slice(aadLength);
 
-  const cipherText = buf.slice(0, cipherLength).toString();
+    const cipherLength = buf.readInt32LE();
+    buf = buf.slice(4);
 
-  const tag = buf.slice(cipherLength);
+    const cipherText = buf.slice(0, cipherLength);
 
-  return {
-    iv,
-    aad,
-    cipherText,
-    tag,
-  };
-};
+    const tag = buf.slice(cipherLength);
 
-const decrypt = (
-  cipherText: string,
-  hash: Buffer,
-  iv: Buffer,
-  aad: NodeJS.ArrayBufferView,
-  tag: NodeJS.ArrayBufferView,
-): ZoomContext => {
-  const decipher: crypto.DecipherGCM = crypto
-    .createDecipheriv('aes-256-gcm', hash, iv)
-    .setAAD(aad)
-    .setAuthTag(tag)
-    .setAutoPadding(false);
+    return {
+        iv,
+        aad,
+        cipherText,
+        tag,
+    };
+}
 
-  const update: string = decipher.update(cipherText, 'ascii', 'utf-8');
-  const final: string = decipher.final('utf-8');
 
-  const decrypted: string = update + final;
+const  decrypt = (cipherText:any, hash:any, iv:any, aad:any, tag:any) => {
 
-  return JSON.parse(decrypted);
-};
+    const decipher = crypto
+        .createDecipheriv('aes-256-gcm', hash, iv)
+        .setAAD(aad)
+        .setAuthTag(tag)
+        .setAutoPadding(false);
 
-export const getAppContext = (header: string, secret = ''): ZoomContext => {
-  if (!header || typeof header !== 'string')
-    throw createError(500, 'context header must be a valid string');
+    const update = decipher.update(cipherText, 'hex', 'utf-8');
+    const final = decipher.final('utf-8');
 
-  const key: string = secret || process.env.ZM_CLIENT_SECRET;
+    const decrypted = update + final;
 
-  const { iv, aad, cipherText, tag } = unpack(header);
+    return JSON.parse(decrypted);
+}
 
-  const hash: Buffer = crypto.createHash('sha256').update(key).digest();
 
-  return decrypt(cipherText, hash, iv, aad, tag);
-};
+export const getAppContext = (header:string, secret = '') => {
+    if (!header || typeof header !== 'string')
+        throw createError(500, 'context header must be a valid string');
+
+    const key = secret || process.env.ZM_CLIENT_SECRET;
+
+    const { iv, aad, cipherText, tag } = unpack(header);
+
+    const hash = crypto.createHash('sha256').update(key).digest();
+
+    return decrypt(cipherText, hash, iv, aad, tag);
+}
 
 export const contextHeader = 'x-zoom-app-context';

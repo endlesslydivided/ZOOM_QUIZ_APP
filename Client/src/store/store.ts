@@ -1,6 +1,5 @@
-import {configureStore} from "@reduxjs/toolkit";
+import {Store, configureStore} from "@reduxjs/toolkit";
 import {apiSlice} from "../services/ApiSlice";
-
 import quizzesReducer from "./slices/QuizzesSlice";
 import resultsReducer from "./slices/ResultsSlice";
 import zoomContextReducer from "./slices/ZoomContextSlice";

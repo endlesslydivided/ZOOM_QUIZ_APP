@@ -1,10 +1,10 @@
-import { Avatar, MenuProps } from 'antd';
-import { Layout, Menu,Image,Typography } from 'antd';
-import { NavLink, useNavigate, Outlet } from 'react-router-dom';
+import { QuestionOutlined, SmileOutlined, TrophyOutlined } from '@ant-design/icons';
+import { Image, Layout, Menu, MenuProps, Typography } from 'antd';
+import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useAppSelector } from '../../hooks/redux';
 import { ANSWER_ROUTE, QUIZZES_ROUTE, RESULTS_ROUTE } from '../../utils/consts';
 import './SmMdLayout.scss';
-import { QuestionOutlined, SmileOutlined, TrophyOutlined } from '@ant-design/icons';
+import React from 'react';
 
 //@ts-expect-error
 import logo from '../../assets/logo/logo.png';

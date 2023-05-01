@@ -117,7 +117,7 @@ export class QuizGateway
   }
 
   @UseGuards(ZoomContextGuard)
-  handleConnection(client: Socket, ...args: unknown[]): void {
+  handleConnection(client: Socket, ...args: any[]): void {
     const auth: Record<string, string> = client.handshake.auth;
     const zoomContext: ZoomContext =
       auth.context &&

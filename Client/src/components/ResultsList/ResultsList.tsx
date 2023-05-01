@@ -1,24 +1,22 @@
 import { List, Pagination, PaginationProps, Space, Typography } from "antd";
-import { useDispatch } from "react-redux";
 import { useAppSelector } from "../../hooks/redux";
-import { useNotify } from "../../hooks/useNotify";
-import './ResultsList.scss';
-import ResultsListItem from "./ResultsListItem";
+import { usePagination } from "../../hooks/usePagination";
 import { useGetPlaySessionsResultsQuery } from "../../services/PlaySessionsApiSlice";
 import { setResults } from "../../store/slices/ResultsSlice";
-import { usePagination } from "../../hooks/usePagination";
+import { RootState } from "../../store/store";
+import './ResultsList.scss';
+import ResultsListItem from "./ResultsListItem";
+import { UserPlaySessionResult } from "../../types/storeSliceTypes";
+import React from 'react';
 
 interface ResultsListProps
 {
 
 }
 
-
-
 const ResultsList:React.FC<ResultsListProps> = () =>
 {
-    const results:any = useAppSelector((state:any) => state.results);
-
+    const results:UserPlaySessionResult[] = useAppSelector((state:RootState) => state.results);
 
     const {setFilters,filters,pagesCount,getContentResult} = usePagination(
         {
@@ -29,8 +27,6 @@ const ResultsList:React.FC<ResultsListProps> = () =>
     ) 
 
     const onChangePage: PaginationProps['onChange'] = (page) => setFilters((p:any) => {return {...p, page}});
-
- 
 
     return (
         <Space size={'middle'} direction="vertical">
@@ -46,12 +42,11 @@ const ResultsList:React.FC<ResultsListProps> = () =>
 
                 grid={{gutter:10,column:2}}
                 dataSource={results}
-                renderItem={(result:any) => <ResultsListItem result={result}/>}/>
+                renderItem={(result:UserPlaySessionResult) => <ResultsListItem result={result}/>}/>
             <Pagination current={filters.page}  defaultPageSize={filters.limit} total={pagesCount} onChange={onChangePage}/>
 
         </Space>
     )
-
 }
 
 export default ResultsList;

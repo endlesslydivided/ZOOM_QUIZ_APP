@@ -31,7 +31,7 @@ export class AuthController {
   }
 
   @Get('/token')
-  async redirectClient(
+  async getToken(
     @Query() { code, verifier }: { code: string; verifier: string },
   ): Promise<Record<string, string>> {
     return await this.authService.getToken(code, verifier, 'S256');
@@ -47,7 +47,6 @@ export class AuthController {
   @UseGuards(AccessTokenGuard)
   @Get('/me')
   async getMe(
-    @ZoomContext() zoomContext: ZoomContext,
     @ZoomAccessToken() token: string,
   ): Promise<Record<string, string>> {
     return await this.authService.getMe(token);

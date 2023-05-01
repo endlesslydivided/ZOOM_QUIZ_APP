@@ -1,33 +1,32 @@
-import { notification } from "antd";
-import {apiSlice} from "./ApiSlice";
 import { setDecryptedContext, setToken, setUser } from "../store/slices/ZoomContextSlice";
+import { ZoomContext, ZoomTokens, ZoomUser } from "../types/storeSliceTypes";
+import { apiSlice } from "./ApiSlice";
 
 
 export const authApiSlice = apiSlice.injectEndpoints({
     endpoints: builder => ({
-        getContext: builder.query({
+        getContext: builder.query<ZoomContext,null>({
             query: () => ({
                 url: '/context',
                 method: 'GET',
                 credentials: 'include',
             }),
-            onQueryStarted: async (id, {dispatch, queryFulfilled}) => {
+            onQueryStarted: async (args, {dispatch, queryFulfilled}) => {
                 
                 const {data} = await queryFulfilled;
                 dispatch(setDecryptedContext(data));
-                
-
+            
             }
         }),
 
-        getToken: builder.query({
+        getToken: builder.query<ZoomTokens,{params:{code?:string,verifier?:string}}>({
             query: ({params}) => ({
                 url: '/auth/token',
                 method: 'GET',
                 credentials: 'include',
                 params
             }),
-            onQueryStarted: async (id, {dispatch, queryFulfilled}) => {
+            onQueryStarted: async (args, {dispatch, queryFulfilled}) => {
                          
                 const {data} = await queryFulfilled;
                 dispatch(setToken(data));
@@ -35,13 +34,13 @@ export const authApiSlice = apiSlice.injectEndpoints({
             }
         }),
 
-        getMe: builder.query({
-            query: ({params}) => ({
+        getMe: builder.query<ZoomUser,null>({
+            query: () => ({
                 url: '/auth/me',
                 method: 'GET',
                 credentials: 'include'
             }),
-            onQueryStarted: async (id, {dispatch, queryFulfilled}) => {
+            onQueryStarted: async (args, {dispatch, queryFulfilled}) => {
                          
                 const {data} = await queryFulfilled;
                 dispatch(setUser(data));

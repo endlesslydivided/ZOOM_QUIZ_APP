@@ -1,39 +1,40 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { Slice, createSlice } from "@reduxjs/toolkit";
+import { UserQuiz } from "../../types/storeSliceTypes";
 
 
-export const quizzesSlice: any = createSlice({
-  initialState: <any>[],
+export const quizzesSlice:Slice<UserQuiz[]> = createSlice({
+  initialState: Array<UserQuiz>,
   name: "quizzesSlice",
   reducers: {
-    setQuizzes: (state: any, action) => {
-      const quizzes = action.payload;
+    setQuizzes: (state, action) => {
+      const quizzes:UserQuiz[] = action.payload;
       return [...quizzes];
     },
-    appendQuiz: (state: any, action) => {
-      const data = action.payload;
+    appendQuiz: (state, action) => {
+      const data:UserQuiz = action.payload;
       return [data, ...state];
     },
-    appendQuizzes: (state: any, action) => {
-      const data = action.payload;
+    appendQuizzes: (state, action) => {
+      const data:UserQuiz[] = action.payload;
       return [...data, ...state];
     },
-    deleteQuiz: (state: any, action) => {
-      const id = action.payload;
-      return [...state.filter((i: any) => i.id !== id)];
+    deleteQuiz: (state, action) => {
+      const id:string = action.payload;
+      return [...state.filter((i: UserQuiz) => i.id !== id)];
     },
 
-    appendPage:(state:any,action:any) =>
+    appendPage:(state,action) =>
     {
-      const data = action.payload;
-      const retrievedQuizzes = data.filter((c:any) => !state?.includes(c));
+      const data:UserQuiz[] = action.payload;
+      const retrievedQuizzes:UserQuiz[] = data.filter((c:UserQuiz) => !state?.includes(c));
 
-      const editedQuizzes = retrievedQuizzes.filter((r:any) => state?.some((c:any) => c.id === r.id));
+      const editedQuizzes:UserQuiz[] = retrievedQuizzes.filter((r:UserQuiz) => state?.some((c:UserQuiz) => c.id === r.id));
 
-      const newQuizzes = retrievedQuizzes.filter((c:any) => !state?.some((r:any) => c.id === r.id));
+      const newQuizzes:UserQuiz[] = retrievedQuizzes.filter((c:UserQuiz) => !state?.some((r:UserQuiz) => c.id === r.id));
 
-      const appliedQuizzes = [...state?.map((c:any) => editedQuizzes.map((e:any) => c.id === e.id ? e : c)[0] || c)];
+      const appliedQuizzes:UserQuiz[] = [...state!.map((c:UserQuiz) => editedQuizzes.map((e:UserQuiz) => c.id === e.id ? e : c)[0] || c)];
 
-      const finalList = appliedQuizzes ? [...appliedQuizzes,...newQuizzes]: [...newQuizzes];
+      const finalList:UserQuiz[] = appliedQuizzes ? [...appliedQuizzes,...newQuizzes]: [...newQuizzes];
 
       return finalList;
     },

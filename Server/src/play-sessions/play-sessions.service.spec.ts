@@ -1,17 +1,16 @@
-import { ModuleMocker, MockFunctionMetadata} from 'jest-mock';
-import { PlaySessionsService } from './play-sessions.service';
-import { Quiz } from '../quizzes/quiz.entity';
-import { PlaySession } from './playSession.entity';
-import { Answer } from '../answers/answer.entity';
-import { Result } from '../results/result.entity';
+import { BadRequestException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
-import { DataSource } from 'typeorm';
 import { createStubInstance } from 'sinon';
-import * as typeorm from 'typeorm';
-import { CreatePlaySessionDTO } from './dto/CreatePlaySession';
-import { BadRequestException, InternalServerErrorException } from '@nestjs/common';
 import { ZoomContext } from 'src/auth/decorators/zoomContext.decorator';
+import * as typeorm from 'typeorm';
+import { DataSource } from 'typeorm';
+import { Answer } from '../answers/answer.entity';
+import { Quiz } from '../quizzes/quiz.entity';
+import { Result } from '../results/result.entity';
+import { CreatePlaySessionDTO } from './dto/CreatePlaySession';
 import { Report } from './interfaces/interfaces';
+import { PlaySessionsService } from './play-sessions.service';
+import { PlaySession } from './playSession.entity';
 
 
 describe('PlaySessionsService', () => {

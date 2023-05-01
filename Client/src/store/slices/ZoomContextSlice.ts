@@ -1,36 +1,34 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { Slice, createSlice } from "@reduxjs/toolkit";
+import { UserZoomContext, ZoomContextString, DecryptedContext, ZoomTokens, ZoomUser } from "../../types/storeSliceTypes";
 
+const initialState: UserZoomContext = {context: null,decrypted:null,tokens:null,user:null};
 
-export const zoomContextSlice: any = createSlice({
-  initialState: {context: null,decrypted:null,tokens:null,user:null},
-  name: "zoomContextSlice",
-  reducers: {
-    setContext: (state: any, action) => {
-      const context = action.payload;
-      state.context = context;
-
-      return  state;
-    },
-    setDecryptedContext: (state: any, action) => {
-      const context = action.payload;
-      state.decrypted = context;
-
-      return  state;
-    },
-    setToken: (state: any, action) => {
-      const tokens = action.payload;
-      state.tokens = tokens;
-
-      return  state;
-    },
-    setUser: (state: any, action) => {
-      const user = action.payload;
-      state.user = user;
-
-      return  state;
+export const zoomContextSlice: Slice<UserZoomContext> = createSlice({
+    initialState,
+    name: "zoomContextSlice",
+    reducers: {
+      setContext: (state, action) => {
+        const context : ZoomContextString = action.payload;
+        state.context = context;
+        return  state;
+      },
+      setDecryptedContext: (state, action) => {
+        const context : DecryptedContext = action.payload;
+        state.decrypted = context;
+        return  state;
+      },
+      setToken: (state, action) => {
+        const tokens : ZoomTokens = action.payload;
+        state.tokens = tokens;
+        return  state;
+      },
+      setUser: (state, action) => {
+        const user : ZoomUser = action.payload;
+        state.user = user;
+        return  state;
+      }
     }
   }
-}
 );
 
 export const {
