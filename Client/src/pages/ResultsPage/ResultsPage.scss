@@ -1,19 +1,15 @@
-.results-page-container
-{
-    display:grid;
+.results-page-container {
+    display: grid;
     margin: 15px 0px;
 
-    .ant-row.results-row
-    {
+    .ant-row.results-row {
         width: 75vw;
-        justify-self:center;
+        justify-self: center;
 
-        .results-postlist-col
-        {
-            .ant-space
-            {
+        .results-postlist-col {
+            .ant-space {
                 width: 100%;
-                justify-self:center;
+                justify-self: center;
             }
         }
     }

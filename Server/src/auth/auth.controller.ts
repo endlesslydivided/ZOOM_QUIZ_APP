@@ -2,24 +2,25 @@ import {
   Controller,
   Get,
   Query,
-  Req,
   Res,
   Session,
   UseGuards,
 } from '@nestjs/common';
-import { Request, Response } from 'express';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { Response } from 'express';
 import { Session as ExpressSession } from 'express-session';
-import { RedirectQuery } from './queryUtils/RedirectQuery';
-import { AuthService } from './auth.service';
-import { ZoomRefreshToken } from './decorators/refreshToken.decorator.';
-import { ZoomContext } from './decorators/zoomContext.decorator';
-import { AccessTokenGuard } from './guards/accessToken.guard';
-import { ZoomAccessToken } from './decorators/accessToken.decorator';
 
+import { AuthService } from './auth.service';
+import { ZoomAccessToken } from './decorators/accessToken.decorator';
+import { ZoomRefreshToken } from './decorators/refreshToken.decorator.';
+import { AccessTokenGuard } from './guards/accessToken.guard';
+
+@ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
 
+  @ApiOperation({ summary: 'Generate deeplink and redirect user' })
   @Get()
   async redirect(
     @Query() code: string,

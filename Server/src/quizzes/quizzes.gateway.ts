@@ -1,4 +1,4 @@
-import { forwardRef, Inject, Logger, UseGuards } from '@nestjs/common';
+import { Inject, Logger, UseGuards } from '@nestjs/common';
 import {
   MessageBody,
   OnGatewayConnection,
@@ -8,20 +8,20 @@ import {
   WebSocketGateway,
   WebSocketServer,
 } from '@nestjs/websockets';
+import { ConnectedSocket } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 
-import { ConnectedSocket } from '@nestjs/websockets';
-import { ZoomContextGuard } from '../auth/guards/zoomContext.guard';
-import { CreatePlaySessionDTO } from '../play-sessions/dto/CreatePlaySession';
-import { PlaySessionsService } from '../play-sessions/play-sessions.service';
-import { CreateResultDTO } from '../results/dto/CreateResult.dto';
-import { ResultsService } from '../results/results.service';
-import { getAppContext } from '../utils/cipher';
-import { QuizzesService } from './quizzes.service';
-import { ZoomContext } from '../auth/decorators/zoomContext.decorator';
-import { Result } from '../results/result.entity';
 import { Answer } from '../answers/answer.entity';
+import { ZoomContext } from '../auth/decorators/zoomContext.decorator';
+import { ZoomContextGuard } from '../auth/guards/zoomContext.guard';
+import { CreatePlaySessionDTO } from '../play-sessions/createPlaySession.dto';
+import { PlaySessionsService } from '../play-sessions/play-sessions.service';
 import { PlaySession } from '../play-sessions/playSession.entity';
+import { CreateResultDTO } from '../results/createResult.dto';
+import { Result } from '../results/result.entity';
+import { ResultsService } from '../results/results.service';
+import { getAppContext } from '../share/utils/cipher';
+import { QuizzesService } from './quizzes.service';
 
 export enum QuizClientEvent {
   SERVER_SENDS_ANSWERS = 'SERVER_SENDS_ANSWER',
@@ -117,7 +117,7 @@ export class QuizGateway
   }
 
   @UseGuards(ZoomContextGuard)
-  handleConnection(client: Socket, ...args: any[]): void {
+  handleConnection(client: Socket, ...args: unknown[]): void {
     const auth: Record<string, string> = client.handshake.auth;
     const zoomContext: ZoomContext =
       auth.context &&

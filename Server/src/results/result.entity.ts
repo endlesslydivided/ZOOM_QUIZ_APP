@@ -1,20 +1,16 @@
+import { ApiProperty } from '@nestjs/swagger';
+import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
+
 import { Answer } from '../answers/answer.entity';
 import { PlaySession } from '../play-sessions/playSession.entity';
-import {
-  Column,
-  CreateDateColumn,
-  Entity,
-  JoinColumn,
-  ManyToOne,
-  PrimaryGeneratedColumn,
-  UpdateDateColumn,
-} from 'typeorm';
+import { BaseModelEntity } from '../share/entity/baseModel.entity';
 
 @Entity({ name: 'result' })
-export class Result {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
-
+export class Result extends BaseModelEntity {
+  @ApiProperty({
+    example: '792b9eec-1450-437d-9e9d-f220bf335336',
+    description: 'Result answer id',
+  })
   @Column()
   userId: string;
 
@@ -27,10 +23,4 @@ export class Result {
   })
   @JoinColumn({ name: 'playSessionId', referencedColumnName: 'id' })
   playSession: PlaySession;
-
-  @CreateDateColumn({ name: 'createdAt' })
-  createdAt: Date;
-
-  @UpdateDateColumn({ name: 'updatedAt' })
-  updatedAt: Date;
 }

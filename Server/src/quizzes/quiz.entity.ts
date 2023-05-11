@@ -1,23 +1,23 @@
+import { ApiProperty } from '@nestjs/swagger';
+import { Column, Entity, OneToMany } from 'typeorm';
+
 import { Answer } from '../answers/answer.entity';
 import { PlaySession } from '../play-sessions/playSession.entity';
-import {
-  Column,
-  CreateDateColumn,
-  DeleteDateColumn,
-  Entity,
-  OneToMany,
-  PrimaryGeneratedColumn,
-  UpdateDateColumn,
-} from 'typeorm';
+import { SoftModelEntity } from '../share/entity/softModel.entity';
 
 @Entity({ name: 'quiz' })
-export class Quiz {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
-
+export class Quiz extends SoftModelEntity {
+  @ApiProperty({
+    example: '792b9eec-1450-437d-9e9d-f220bf335336',
+    description: 'Quiz question text',
+  })
   @Column()
   userId: string;
 
+  @ApiProperty({
+    example: 'What is the closest planet to the Sun?',
+    description: 'Quiz question text',
+  })
   @Column()
   text: string;
 
@@ -31,13 +31,4 @@ export class Quiz {
     createForeignKeyConstraints: true,
   })
   answers: Answer[];
-
-  @CreateDateColumn({ name: 'createdAt' })
-  createdAt: Date;
-
-  @UpdateDateColumn({ name: 'updatedAt' })
-  updatedAt: Date;
-
-  @DeleteDateColumn({ name: 'deletedAt' })
-  deletedAt?: Date;
 }

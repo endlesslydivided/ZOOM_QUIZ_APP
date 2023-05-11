@@ -1,21 +1,17 @@
-import {
-    List,
-    Space,
-    Typography
-} from 'antd';
+import './PlaySessionList.scss';
+
+import { List, Space, Typography } from 'antd';
 import { useDispatch } from 'react-redux';
+
 import { useAppSelector } from '../../hooks/redux';
 import { useNotify } from '../../hooks/useNotify';
 import { useGetPlaySessionsQuery } from '../../services/PlaySessionsApiSlice';
 import { setPlaySessions } from '../../store/slices/PlaySessionsSlice';
 import { RootState } from '../../store/store';
-import PlaySessionItem from './PlaySessionItem';
-import './PlaySessionList.scss';
 import { UserPlaySession } from '../../types/storeSliceTypes';
+import PlaySessionItem from './PlaySessionItem';
 
-interface PlaySessionListProps {}
-
-const PlaySessionList: React.FC<PlaySessionListProps> = () => {
+const PlaySessionList: React.FC = () => {
     const playSessionsState: UserPlaySession[] = useAppSelector(
         (state: RootState) => state.playSessions
     );

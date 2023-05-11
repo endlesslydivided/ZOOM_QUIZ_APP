@@ -1,13 +1,17 @@
-import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import axios from 'axios';
-import { URL } from 'url';
 import { Session as ExpressSession } from 'express-session';
-import { host as ZoomHost } from '../utils/conts';
+import { URL } from 'url';
+
+import { host as ZoomHost } from '../share/consts/variables.consts';
 
 @Injectable()
 export class AuthService {
   private baseURL: string;
-  private accessToken: string;
   private host: URL;
 
   constructor() {
@@ -42,7 +46,7 @@ export class AuthService {
       })
       .catch((error) => {
         console.log(error);
-        throw new BadRequestException(error)
+        throw new BadRequestException(error);
       });
   }
 
@@ -66,7 +70,7 @@ export class AuthService {
       })
       .catch((error) => {
         console.log(error);
-        throw new BadRequestException(error)
+        throw new BadRequestException(error);
       });
   }
 

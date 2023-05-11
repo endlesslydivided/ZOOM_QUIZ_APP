@@ -1,7 +1,9 @@
-import { Col, Row, Space } from 'antd';
 import './AnswerPage.scss';
-import PlaySessionList from '../../components/PlaySessionList/PlaySessionList';
+
+import { Col, Row, Space } from 'antd';
 import React from 'react';
+
+import PlaySessionList from '../../components/PlaySessionList/PlaySessionList';
 
 const AnswerPage = () => {
     return (

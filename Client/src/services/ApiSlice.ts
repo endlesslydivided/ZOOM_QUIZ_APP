@@ -1,7 +1,10 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/dist/query/react';
+import { QueryReturnValue } from '@reduxjs/toolkit/dist/query/baseQueryTypes';
+import { BaseQueryApi, createApi, FetchArgs, fetchBaseQuery, FetchBaseQueryError, FetchBaseQueryMeta } from '@reduxjs/toolkit/dist/query/react';
 import { notification } from 'antd';
+
 import { RootState } from '../store/store';
 import { UserZoomContext } from '../types/storeSliceTypes';
+import { REFRESH_TOKEN } from '../utils/apiConsts';
 
 const baseQuery = fetchBaseQuery({
     baseUrl: process.env.REACT_APP_BACK_URI,
@@ -35,23 +38,24 @@ const baseQuery = fetchBaseQuery({
 });
 
 const baseQueryWithReauth = async (
-    args?: any,
-    api?: any,
-    extraOptions?: any
+    args: string | FetchArgs,
+    api: BaseQueryApi,
+    extraOptions: object
 ) => {
     let result = await baseQuery(args, api, extraOptions);
 
     if (result?.error?.status === 403) {
-        const refreshResult: any = await baseQuery(
+        const refreshResult: QueryReturnValue<unknown, FetchBaseQueryError, FetchBaseQueryMeta>
+        = await baseQuery(
             {
-                url: '/auth/refresh-token',
+                url: REFRESH_TOKEN,
                 method: 'GET',
             },
             api,
             extraOptions
         );
 
-        if (refreshResult.meta.response.ok) {
+        if (refreshResult.meta?.response?.ok) {
             result = await baseQuery(args, api, extraOptions);
         } else {
             notification.error({

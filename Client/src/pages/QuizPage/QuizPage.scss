@@ -1,19 +1,15 @@
-.quiz-page-container
-{
-    display:grid;
+.quiz-page-container {
+    display: grid;
     margin: 15px 0px;
 
-    .ant-row.quiz-row
-    {
+    .ant-row.quiz-row {
         width: 75vw;
-        justify-self:center;
+        justify-self: center;
 
-        .quiz-postlist-col
-        {
-            .ant-space
-            {
+        .quiz-postlist-col {
+            .ant-space {
                 width: 100%;
-                justify-self:center;
+                justify-self: center;
             }
         }
     }

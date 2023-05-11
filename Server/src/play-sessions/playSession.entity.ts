@@ -1,21 +1,16 @@
-import { Result } from '../results/result.entity';
-import {
-  Column,
-  CreateDateColumn,
-  Entity,
-  JoinColumn,
-  ManyToOne,
-  OneToMany,
-  PrimaryGeneratedColumn,
-  UpdateDateColumn
-} from 'typeorm';
+import { ApiProperty } from '@nestjs/swagger';
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
+
 import { Quiz } from '../quizzes/quiz.entity';
+import { Result } from '../results/result.entity';
+import { BaseModelEntity } from '../share/entity/baseModel.entity';
 
 @Entity({ name: 'playSession' })
-export class PlaySession {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
-
+export class PlaySession extends BaseModelEntity {
+  @ApiProperty({
+    example: '792b9eec-1450-437d-9e9d-f220bf335336',
+    description: 'Meet unique id',
+  })
   @Column()
   meetId: string;
 
@@ -31,10 +26,4 @@ export class PlaySession {
     createForeignKeyConstraints: true,
   })
   results: Result[];
-
-  @CreateDateColumn({ name: 'createdAt' })
-  createdAt: Date;
-
-  @UpdateDateColumn({ name: 'updatedAt' })
-  updatedAt: Date;
 }

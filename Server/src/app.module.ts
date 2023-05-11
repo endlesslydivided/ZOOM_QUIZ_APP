@@ -3,11 +3,14 @@ import { ConfigModule } from '@nestjs/config';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { join } from 'path';
+
 import { Answer } from './answers/answer.entity';
 import { AnswersModule } from './answers/answers.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
+import { AccessTokenMiddleware } from './auth/middlewares/accessToken.middleware';
+import { RefreshTokenMiddleware } from './auth/middlewares/refreshToken.middleware';
 import { ZoomContextMiddleware } from './auth/middlewares/zoomContext.middleware';
 import { PlaySessionsModule } from './play-sessions/play-sessions.module';
 import { PlaySession } from './play-sessions/playSession.entity';
@@ -15,8 +18,6 @@ import { Quiz } from './quizzes/quiz.entity';
 import { QuizzesModule } from './quizzes/quizzes.module';
 import { Result } from './results/result.entity';
 import { ResultsModule } from './results/results.module';
-import { AccessTokenMiddleware } from './auth/middlewares/accessToken.middleware';
-import { RefreshTokenMiddleware } from './auth/middlewares/refreshToken.middleware';
 
 @Module({
   imports: [

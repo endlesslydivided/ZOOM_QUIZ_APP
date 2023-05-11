@@ -1,58 +1,55 @@
-import { setDecryptedContext, setToken, setUser } from "../store/slices/ZoomContextSlice";
-import { ZoomContext, ZoomTokens, ZoomUser } from "../types/storeSliceTypes";
-import { apiSlice } from "./ApiSlice";
-
+import {
+    setDecryptedContext,
+    setToken,
+    setUser,
+} from '../store/slices/ZoomContextSlice';
+import { ZoomContext, ZoomTokens, ZoomUser } from '../types/storeSliceTypes';
+import { GET_CONTEXT, GET_ME,GET_TOKEN } from '../utils/apiConsts';
+import { apiSlice } from './ApiSlice';
 
 export const authApiSlice = apiSlice.injectEndpoints({
-    endpoints: builder => ({
-        getContext: builder.query<ZoomContext,null>({
+    endpoints: (builder) => ({
+        getContext: builder.query<ZoomContext, null>({
             query: () => ({
-                url: '/context',
+                url: GET_CONTEXT,
                 method: 'GET',
                 credentials: 'include',
             }),
-            onQueryStarted: async (args, {dispatch, queryFulfilled}) => {
-                
-                const {data} = await queryFulfilled;
+            onQueryStarted: async (args, { dispatch, queryFulfilled }) => {
+                const { data } = await queryFulfilled;
                 dispatch(setDecryptedContext(data));
-            
-            }
+            },
         }),
 
-        getToken: builder.query<ZoomTokens,{params:{code?:string,verifier?:string}}>({
-            query: ({params}) => ({
-                url: '/auth/token',
+        getToken: builder.query<
+            ZoomTokens,
+            { params: { code?: string; verifier?: string } }
+        >({
+            query: ({ params }) => ({
+                url: GET_TOKEN,
                 method: 'GET',
                 credentials: 'include',
-                params
+                params,
             }),
-            onQueryStarted: async (args, {dispatch, queryFulfilled}) => {
-                         
-                const {data} = await queryFulfilled;
+            onQueryStarted: async (args, { dispatch, queryFulfilled }) => {
+                const { data } = await queryFulfilled;
                 dispatch(setToken(data));
-
-            }
+            },
         }),
 
-        getMe: builder.query<ZoomUser,null>({
+        getMe: builder.query<ZoomUser, null>({
             query: () => ({
-                url: '/auth/me',
+                url: GET_ME,
                 method: 'GET',
-                credentials: 'include'
+                credentials: 'include',
             }),
-            onQueryStarted: async (args, {dispatch, queryFulfilled}) => {
-                         
-                const {data} = await queryFulfilled;
+            onQueryStarted: async (args, { dispatch, queryFulfilled }) => {
+                const { data } = await queryFulfilled;
                 dispatch(setUser(data));
-
-            }
+            },
         }),
-    })
-})
+    }),
+});
 
-
-export const {
-    useGetContextQuery,
-    useLazyGetTokenQuery,
-    useLazyGetMeQuery
-} = authApiSlice;
+export const { useGetContextQuery, useLazyGetTokenQuery, useLazyGetMeQuery } =
+    authApiSlice;

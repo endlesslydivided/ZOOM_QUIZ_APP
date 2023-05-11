@@ -1,7 +1,9 @@
-import { Col, Row, Space } from 'antd';
 import './ResultsPage.scss';
-import ResultsList from '../../components/ResultsList/ResultsList';
+
+import { Col, Row, Space } from 'antd';
 import React from 'react';
+
+import ResultsList from '../../components/ResultsList/ResultsList';
 
 const ResultsPage = () => {
     return (

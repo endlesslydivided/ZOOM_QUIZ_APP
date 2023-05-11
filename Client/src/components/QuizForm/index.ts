@@ -1,1 +1,1 @@
-export {default} from './QuizForm'
+export { default } from './QuizForm';

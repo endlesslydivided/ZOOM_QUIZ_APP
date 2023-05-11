@@ -1,6 +1,7 @@
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import axios, { AxiosResponse, InternalAxiosRequestConfig } from 'axios';
 import * as compression from 'compression';
 import * as cookieParser from 'cookie-parser';
@@ -8,9 +9,10 @@ import debug from 'debug';
 import * as session from 'express-session';
 import helmet from 'helmet';
 import { URL } from 'url';
+
 import { AppModule } from './app.module';
-import { AllExceptionFilter } from './exception/AllException.filter';
-import { ValidationExceptionFactory } from './validation/validation.exceptionFactory';
+import { AllExceptionFilter } from './share/exception/AllException.filter';
+import { ValidationExceptionFactory } from './share/validation/validation.exceptionFactory';
 
 const bootstrap = async (): Promise<void> => {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
@@ -102,6 +104,23 @@ const bootstrap = async (): Promise<void> => {
       exceptionFactory: ValidationExceptionFactory,
     }),
   );
+
+  const config = new DocumentBuilder()
+    .setTitle('Zoom Quiz API')
+    .setDescription(
+      `
+      Documentation for the Zoom Quiz application API.`,
+    )
+    .setVersion(`1.0.0`)
+    .setContact(
+      'Alexander Kovalyov',
+      'https://github.com/endlesslydivided',
+      'sashakovalev2002@hotmail.com',
+    )
+    .build();
+
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('api', app, document);
 
   await app.listen(process.env.PORT || 3001);
 };

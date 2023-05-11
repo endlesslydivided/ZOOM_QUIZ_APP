@@ -1,39 +1,26 @@
-
-
-.quiz-list
-{
-    padding:0px;
+.quiz-list {
+    padding: 0px;
     margin: 0px;
 
-    .ant-list-item
-    {
+    .ant-list-item {
         padding: 0px;
     }
-    .quiz-list-card
-    {
-        padding:0px;
-        margin:0px;
-        width:100%;
+    .quiz-list-card {
+        padding: 0px;
+        margin: 0px;
+        width: 100%;
 
-
-        .answers-collapse
-        {
+        .answers-collapse {
             width: 100%;
-            .answer-text
-            {
-                &.wrong-answer
-                {
-                    
-                    background-color:rgba(214, 80, 80, 0.633);
+            .answer-text {
+                &.wrong-answer {
+                    background-color: rgba(214, 80, 80, 0.633);
                 }
 
-                &.correct-answer
-                {
-                    background-color:rgba(9, 208, 59, 0.771);
+                &.correct-answer {
+                    background-color: rgba(9, 208, 59, 0.771);
                 }
             }
-
         }
     }
 }
-

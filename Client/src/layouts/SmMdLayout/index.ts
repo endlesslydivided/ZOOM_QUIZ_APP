@@ -1,1 +1,1 @@
-export {default} from './SmMdLayout';
+export { default } from './SmMdLayout';

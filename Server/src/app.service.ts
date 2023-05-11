@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import * as crypto from 'crypto';
 import { URL } from 'url';
-import { base64URL, rand } from './utils/apiUtils';
+
+import { base64URL, rand } from './share/utils/apiUtils';
 
 @Injectable()
 export class AppService {

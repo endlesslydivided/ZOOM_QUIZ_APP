@@ -1,7 +1,4 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
-import { Answer } from '../answers/answer.entity';
-import { ZoomContext } from '../auth/decorators/zoomContext.decorator';
-import DBQueryParameters from '../requestFeatures/dbquery.params';
 import {
   DataSource,
   QueryRunner,
@@ -9,7 +6,11 @@ import {
   TypeORMError,
   UpdateResult,
 } from 'typeorm';
-import { CreateQuizDTO } from './dto/createQuiz.dto';
+
+import { Answer } from '../answers/answer.entity';
+import { ZoomContext } from '../auth/decorators/zoomContext.decorator';
+import DBQueryParameters from '../share/requestFeatures/dbquery.params';
+import { CreateQuizDTO } from './createQuiz.dto';
 import { Quiz } from './quiz.entity';
 
 @Injectable()

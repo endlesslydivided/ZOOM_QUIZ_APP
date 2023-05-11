@@ -1,1 +1,1 @@
-export {default} from './PlaySessionList'
+export { default } from './PlaySessionList';

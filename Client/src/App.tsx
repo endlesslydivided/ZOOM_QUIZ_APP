@@ -1,58 +1,67 @@
-import zoomSdk from "@zoom/appssdk";
+import './App.scss';
+
+import zoomSdk from '@zoom/appssdk';
 import { notification } from 'antd';
 import { useEffect } from 'react';
-import './App.scss';
+
 import AppRouter from './components/AppRouter';
-import { useLazyGetMeQuery, useLazyGetTokenQuery } from './services/AuthApiSlice';
+import {
+    useLazyGetMeQuery,
+    useLazyGetTokenQuery,
+} from './services/AuthApiSlice';
+import { codeChallenge, state, verifier,ZoomCapabilities } from './utils/zoomConsts';
 
-const codeChallenge =  "chbDH4tbSj1MZu6-aI-pWPpTnIYNa9lQp8FuFnqemJs";
-const state = "TIA5UgoMte";
-const base64URL = (s:any) => s.toString('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
+const base64URL = (s: string | Buffer) =>
+    s
+        .toString('base64')
+        .replace(/\+/g, '-')
+        .replace(/\//g, '_')
+        .replace(/=/g, '');
 
-function App() 
-{
-
+function App() {
     const [getToken] = useLazyGetTokenQuery();
     const [getMe] = useLazyGetMeQuery();
 
-    const configAuth = async () => 
-    {
-    
-      const result = await zoomSdk.config({capabilities: ["getRunningContext","getSupportedJsApis","openUrl","authorize","onAuthorized"]})
+    const configAuth = async () => {
+        await zoomSdk.config({
+            capabilities: [
+                ZoomCapabilities.GET_RUNNING_CONTEXT,
+                ZoomCapabilities.GET_SUPPORTED_JS_APIS,
+                ZoomCapabilities.OPEN_URL,
+                ZoomCapabilities.AUTHORIZE,
+                ZoomCapabilities.ON_AUTHORIZE,
+            ],
+        });
 
-      const challenge = base64URL(codeChallenge);
+        const challenge = base64URL(codeChallenge);
 
-      zoomSdk.addEventListener("onAuthorized", async (event) =>{
+        zoomSdk.addEventListener(
+            'onAuthorized',
+            async (event: { code: string; state: string }) => {
+                const params = {
+                    code: event.code,
+                    state: event.state,
+                    verifier,
+                };
 
-      const params =
-      {
-        code:event.code,
-        state:event.state,
-        verifier:'ac3e722ede6ff88fac10cb6e02e2f63ab0acf08148f91b699988e097',
-      }
+                await getToken({ params });
+                await getMe(null);
+            }
+        );
 
-      await getToken({params});
-      await getMe(null);
+        zoomSdk.authorize({ state, codeChallenge: challenge }).catch(() => {
+            notification.error({
+                message:
+                    'Some erro occured during ZoomSDK authorize. You better restart the app.',
+            });
+        });
+    };
 
-    });
+    useEffect(() => {
+        configAuth();
+    }, []);
 
-    zoomSdk.authorize({state,codeChallenge:challenge})
-    .catch((e) => 
-    {
-      notification.error({message:'Some erro occured during ZoomSDK authorize. You better restart the app.'});
-    });
-  }
-
-  useEffect(()=>
-  {
-    configAuth();  
-   
-  },[])
-  
-  return (
-    <AppRouter/>
-
-  );
+    return <AppRouter />;
 }
 
 export default App;

@@ -1,1 +1,1 @@
-export {default} from './AnswerPage'
+export { default } from './AnswerPage';

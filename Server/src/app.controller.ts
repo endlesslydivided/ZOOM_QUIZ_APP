@@ -1,27 +1,14 @@
-import {
-  Controller,
-  Get,
-  Inject,
-  Req,
-  Res,
-  Session,
-  UseGuards,
-  forwardRef,
-} from '@nestjs/common';
-import { AppService } from './app.service';
+import { Controller, Get, Req, Res, Session } from '@nestjs/common';
 import { Request, Response } from 'express';
-import { contextHeader, getAppContext } from './utils/cipher.js';
 import { Session as ExpressSession } from 'express-session';
-import { ZoomContextGuard } from './auth/guards/zoomContext.guard';
+
+import { AppService } from './app.service';
 import { ZoomContext } from './auth/decorators/zoomContext.decorator';
-import { AuthService } from './auth/auth.service';
+import { contextHeader } from './share/utils/cipher.js';
 
 @Controller()
 export class AppController {
-  constructor(
-    private readonly appService: AppService,
-    @Inject(AuthService) private authService: AuthService,
-  ) {}
+  constructor(private readonly appService: AppService) {}
 
   @Get()
   async homeRoute(@Req() req: Request, @Res() res: Response): Promise<void> {

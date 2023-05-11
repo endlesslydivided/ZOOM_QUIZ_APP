@@ -1,9 +1,10 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { DataSource, QueryRunner, TypeORMError } from 'typeorm';
-import { CreateResultDTO } from './dto/CreateResult.dto';
-import { PlaySession } from '../play-sessions/playSession.entity';
-import { Result } from './result.entity';
+
 import { Answer } from '../answers/answer.entity';
+import { PlaySession } from '../play-sessions/playSession.entity';
+import { CreateResultDTO } from './createResult.dto';
+import { Result } from './result.entity';
 
 @Injectable()
 export class ResultsService {
@@ -15,45 +16,34 @@ export class ResultsService {
     await queryRunner.connect();
     await queryRunner.startTransaction();
 
-    const playSession: PlaySession = await this.dataSource
-      .getRepository(PlaySession)
-      .findOneBy({ id: dto.playSessionId })
-      .catch((error: TypeORMError) => {
-        console.log(error);
-        throw new InternalServerErrorException(
-          'Result isn`t created. Internal server error occure',
-        );
-      });
+    try {
+      const playSession: PlaySession = await this.dataSource
+        .getRepository(PlaySession)
+        .findOneBy({ id: dto.playSessionId });
 
-    const answer: Answer = await this.dataSource
-      .getRepository(Answer)
-      .findOneBy({ id: dto.answerId })
-      .catch((error: TypeORMError) => {
-        console.log(error);
-        throw new InternalServerErrorException(
-          'Result isn`t created. Internal server error occure',
-        );
-      });
+      const answer: Answer = await this.dataSource
+        .getRepository(Answer)
+        .findOneBy({ id: dto.answerId });
 
-    const answerResult: Result = new Result();
+      const answerResult: Result = new Result();
 
-    answerResult.playSession = playSession;
-    answerResult.userId = dto.userId;
-    answerResult.answer = answer;
+      answerResult.playSession = playSession;
+      answerResult.userId = dto.userId;
+      answerResult.answer = answer;
 
-    const result: Result = await queryRunner.manager
-      .save(answerResult)
-      .catch(async (error: TypeORMError) => {
-        await queryRunner.rollbackTransaction();
-        await queryRunner.release();
-        throw new InternalServerErrorException(
-          'Result entry is not created. Internal server error occured.',
-        );
-      });
+      const result: Result = await queryRunner.manager.save(answerResult);
 
-    await queryRunner.commitTransaction();
-    await queryRunner.release();
+      await queryRunner.commitTransaction();
+      await queryRunner.release();
 
-    return result;
+      return result;
+    } catch (e) {
+      await queryRunner.rollbackTransaction();
+      await queryRunner.release();
+      console.log(e.message);
+      throw new InternalServerErrorException(
+        'Result entry is not created. Internal server error occured.',
+      );
+    }
   }
 }

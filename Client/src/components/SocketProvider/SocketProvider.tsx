@@ -1,115 +1,123 @@
+import './SocketProvider.scss';
+
 import { Col, notification, Row, Typography } from 'antd';
-import React, { createContext, useEffect, useState } from 'react';
+import React, { createContext, ReactNode, useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import { Socket } from 'socket.io-client';
+import * as io from 'socket.io-client'
+
 import { useAppSelector } from '../../hooks/redux';
-import {  appendPlaySession, updateResultPlaySession } from '../../store/slices/PlaySessionsSlice';
-import { ANSWER_ROUTE } from '../../utils/consts';
-import './SocketProvider.scss';
+import {
+    appendPlaySession,
+    updateResultPlaySession,
+} from '../../store/slices/PlaySessionsSlice';
 import { RootState } from '../../store/store';
+import { Result } from '../../types/entityTypes';
+import { UserPlaySession } from '../../types/storeSliceTypes';
+import { AppRoutes } from '../../utils/routeConsts';
 
-const io = require('socket.io-client');
-
-export enum QuizClientEvent 
-{
+export enum QuizClientEvent {
     SERVER_SENDS_ANSWERS = 'SERVER_SENDS_ANSWER',
-    SERVER_PROVIDES_QUIZ = 'SERVER_PROVIDES_QUIZ'
+    SERVER_PROVIDES_QUIZ = 'SERVER_PROVIDES_QUIZ',
 }
 
-export enum QuizServerEvent 
-{
+export enum QuizServerEvent {
     CLIENT_PROVIDES_QUIZ = 'CLIENT_PROVIDES_QUIZ',
-    CLIENT_SENDS_ANSWER = 'CLIENT_SENDS_ANSWER'
+    CLIENT_SENDS_ANSWER = 'CLIENT_SENDS_ANSWER',
 }
 
-interface SocketProviderProps
-{
-    children: string | JSX.Element | JSX.Element[]
+interface SocketProviderProps {
+    children: string | JSX.Element | JSX.Element[];
 }
 
-export const SocketContext:any = createContext(null);
+export const SocketContext = createContext<Socket | null>(null);
 
-export const SocketProvider:React.FC<SocketProviderProps> = ({children}) => {
-
-    const context = useAppSelector((state:RootState) => state.zoomContext.context);
+export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
+    const context = useAppSelector(
+        (state: RootState) => state.zoomContext.context
+    );
 
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
-    const [socket,setSocket]:any = useState(null);
+    const [socket, setSocket] = useState<any>(null);
     const [api, contextHolder] = notification.useNotification();
-    const openNotification = ({message,description,key}:any) => {
+    const openNotification = ({ message, description, key } : {message:ReactNode, description?:string,key:string}) => {
         api.open({
-          message,
-          description,
-          className: 'socket-notify',
-          placement:'bottomLeft',
-          duration:300,
-          key
+            message,
+            description,
+            className: 'socket-notify',
+            placement: 'bottomLeft',
+            duration: 300,
+            key,
         });
     };
 
-
-    useEffect(() =>
-    {
-        if (!socket) 
-        {
-            setSocket(io.connect(process.env.REACT_APP_BACK_URI, 
-                {
+    useEffect(() => {
+        if (!socket) {
+            setSocket(
+                io.connect(process.env.REACT_APP_BACK_URI as string, 
+                    {
                     path: '/play-quiz',
                     withCredentials: true,
-                    auth:{context},
-                    extraHeaders:{
-                        'x-zoom-app-context':context
-                    }
-                }));
-        }
-        else
-        {
-          socket.on(QuizClientEvent.SERVER_PROVIDES_QUIZ,async (data: any) => {
-            dispatch(appendPlaySession(data));  
-            if(!window.location.pathname.match(ANSWER_ROUTE))   
-            {
-                api.destroy(data.id);
-                openNotification(
-                {
-                    key:data.id,
-                    message:(
-                        <Row gutter={[10,10]} style={{flexWrap:'nowrap',cursor:'pointer'}} onClick={() => {
-                            navigate(`${ANSWER_ROUTE}`)
-                            api.destroy(data.id);
-                        }}>
-                            <Col>
-                                <Typography.Title level={5}>New quiz!</Typography.Title>
-                                <Typography.Text>{data.quiz.text}</Typography.Text>
-                            </Col>
-                        </Row>
-                    )
+                    auth: { context },
+                    extraHeaders: {
+                        'x-zoom-app-context': context as string,
+                    },
                 })
-            }
-          });
+            );
+        } else {
+            socket.on(
+                QuizClientEvent.SERVER_PROVIDES_QUIZ,
+                async (data: UserPlaySession) => {
+                    dispatch(appendPlaySession(data));
+                    if (!window.location.pathname.match(AppRoutes.ANSWER_ROUTE)) {
+                        api.destroy(data.id);
+                        openNotification({
+                            key: data.id,
+                            message: (
+                                <Row
+                                    gutter={[10, 10]}
+                                    style={{
+                                        flexWrap: 'nowrap',
+                                        cursor: 'pointer',
+                                    }}
+                                    onClick={() => {
+                                        navigate(`${AppRoutes.ANSWER_ROUTE}`);
+                                        api.destroy(data.id);
+                                    }}
+                                >
+                                    <Col>
+                                        <Typography.Title level={5}>
+                                            New quiz!
+                                        </Typography.Title>
+                                        <Typography.Text>
+                                            {data.quiz.text}
+                                        </Typography.Text>
+                                    </Col>
+                                </Row>
+                            ),
+                        });
+                    }
+                }
+            );
 
-          socket.on(QuizClientEvent.SERVER_SENDS_ANSWERS,async (data: any) => {
-            dispatch(updateResultPlaySession(data));     
-          });
-        }       
-    },[socket])
+            socket.on(
+                QuizClientEvent.SERVER_SENDS_ANSWERS,
+                async (data: Result) => {
+                    dispatch(updateResultPlaySession(data));
+                }
+            );
+        }
+    }, [socket]);
 
-    
-
-  return (
-  <>
-    {contextHolder}
-    <SocketContext.Provider value={socket}>
-        {children}
-    </SocketContext.Provider>
-  </>
-  )     
-}
-
-
-
-
- 
-  
-  
+    return (
+        <>
+            {contextHolder}
+            <SocketContext.Provider value={socket}>
+                {children}
+            </SocketContext.Provider>
+        </>
+    );
+};

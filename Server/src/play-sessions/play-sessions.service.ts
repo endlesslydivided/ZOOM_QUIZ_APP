@@ -1,32 +1,30 @@
 import {
   BadRequestException,
   Injectable,
-  InternalServerErrorException
+  InternalServerErrorException,
 } from '@nestjs/common';
+import { DataSource, QueryRunner, TypeORMError } from 'typeorm';
+
 import { ZoomContext } from '../auth/decorators/zoomContext.decorator';
 import { Quiz } from '../quizzes/quiz.entity';
-import DBQueryParameters from '../requestFeatures/dbquery.params';
-import { DataSource, QueryRunner, TypeORMError } from 'typeorm';
-import { CreatePlaySessionDTO } from './dto/CreatePlaySession';
-import { Report } from './interfaces/interfaces';
+import DBQueryParameters from '../share/requestFeatures/dbquery.params';
+import { CreatePlaySessionDTO } from './createPlaySession.dto';
+import { Report } from './interfaces';
 import { PlaySession } from './playSession.entity';
 
 @Injectable()
 export class PlaySessionsService {
-  constructor(
-    private dataSource: DataSource,
-  ) {}
+  constructor(private dataSource: DataSource) {}
 
   async createPlaySession(dto: CreatePlaySessionDTO): Promise<PlaySession> {
     const queryRunner: QueryRunner = this.dataSource.createQueryRunner();
-    
+
     await queryRunner.connect();
     await queryRunner.startTransaction();
 
     const quiz: Quiz = await this.dataSource
       .getRepository(Quiz)
-      .findOne({ where: { id: dto.quizId }, relations: ['answers'] })
-      
+      .findOne({ where: { id: dto.quizId }, relations: ['answers'] });
 
     const playSessionCandidate: PlaySession = await this.dataSource
       .getRepository(PlaySession)
@@ -134,9 +132,7 @@ export class PlaySessionsService {
     return playSessions;
   }
 
-  async getPlaySessionReport(
-    playSessionId: string,
-  ): Promise<Report> {
+  async getPlaySessionReport(playSessionId: string): Promise<Report> {
     const playSessionResults: PlaySession = await this.dataSource
       .createQueryBuilder(PlaySession, 'playSessions')
       .leftJoinAndSelect('playSessions.results', 'result')
