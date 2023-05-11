@@ -1,41 +1,55 @@
-import { Controller, Get, Query, Req, Res, Session } from '@nestjs/common';
-import { Request, Response } from 'express';
-import {Session  as ExpressSession} from 'express-session';
-import { RedirectQuery } from './queryUtils/RedirectQuery';
-import { AuthService } from './auth.service';
+import {
+  Controller,
+  Get,
+  Query,
+  Res,
+  Session,
+  UseGuards,
+} from '@nestjs/common';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { Response } from 'express';
+import { Session as ExpressSession } from 'express-session';
 
+import { AuthService } from './auth.service';
+import { ZoomAccessToken } from './decorators/accessToken.decorator';
+import { ZoomRefreshToken } from './decorators/refreshToken.decorator.';
+import { AccessTokenGuard } from './guards/accessToken.guard';
+
+@ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
+  constructor(private authService: AuthService) {}
 
-    constructor(private authService: AuthService) {}
+  @ApiOperation({ summary: 'Generate deeplink and redirect user' })
+  @Get()
+  async redirect(
+    @Query() code: string,
+    @Res() res: Response,
+    @Session() session: ExpressSession & { state: string; verifier: string },
+  ): Promise<void> {
+    const deeplink = await this.authService.getDeeplink(session, code);
+    res.redirect(deeplink);
+  }
 
+  @Get('/token')
+  async getToken(
+    @Query() { code, verifier }: { code: string; verifier: string },
+  ): Promise<Record<string, string>> {
+    return await this.authService.getToken(code, verifier, 'S256');
+  }
 
-    @Get()
-    async redirect(
-        @Query() {code,state}:any ,
-        @Res() res:Response, 
-        @Session() session:ExpressSession & {state:any,verifier:any})
-    {
-        session.state = null;
+  @Get('/refresh-token')
+  async refreshToken(
+    @ZoomRefreshToken() token: string,
+  ): Promise<Record<string, string>> {
+    return await this.authService.refreshToken(token);
+  }
 
-        try 
-        {
-            
-            const verifier = session.verifier;
-            session.verifier = null;
-    
-            // get Access Token from Zoom
-            const { access_token: accessToken } = await this.authService.getToken(code, verifier);
-    
-            // fetch deeplink from Zoom API
-            const deeplink = await this.authService.getDeeplink(accessToken);
-    
-            // redirect the user to the Zoom Client
-            res.redirect(deeplink);
-        } 
-        catch (e) 
-        {
-            throw e;
-        }
-    }
+  @UseGuards(AccessTokenGuard)
+  @Get('/me')
+  async getMe(
+    @ZoomAccessToken() token: string,
+  ): Promise<Record<string, string>> {
+    return await this.authService.getMe(token);
+  }
 }
