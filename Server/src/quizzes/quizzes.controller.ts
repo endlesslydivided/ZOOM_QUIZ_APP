@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -40,7 +41,11 @@ export class QuizzesController {
     @Body() dto: CreateQuizDTO,
     @ZoomContext() context: ZoomContext,
   ): Promise<Quiz> {
-    return await this.quizzesService.createQuiz(dto, context);
+    try {
+      return await this.quizzesService.createQuiz(dto, context);
+    } catch (e) {
+      throw new BadRequestException(e);
+    }
   }
 
   @ApiOperation({ summary: 'Get user quizzes' })
@@ -51,13 +56,21 @@ export class QuizzesController {
     @ZoomContext() context: ZoomContext,
     @Query(new QueryParamsPipe()) filters: QueryParameters,
   ): Promise<[Quiz[], number]> {
-    return await this.quizzesService.getUserQuizzes(filters, context);
+    try {
+      return await this.quizzesService.getUserQuizzes(filters, context);
+    } catch (e) {
+      throw new BadRequestException(e);
+    }
   }
 
   @ApiOperation({ summary: 'Delete one quiz' })
   @ApiOkResponse({ type: UpdateResult })
   @Delete(':quizId')
   async deleteQuiz(@Param('quizId') quizId: string): Promise<UpdateResult> {
-    return await this.quizzesService.deleteQuiz(quizId);
+    try {
+      return await this.quizzesService.deleteQuiz(quizId);
+    } catch (e) {
+      throw new BadRequestException(e);
+    }
   }
 }

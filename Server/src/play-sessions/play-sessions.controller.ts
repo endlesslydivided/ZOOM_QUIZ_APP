@@ -1,4 +1,11 @@
-import { Controller, Get, Param, Query, UseGuards } from '@nestjs/common';
+import {
+  BadRequestException,
+  Controller,
+  Get,
+  Param,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 
 import { ZoomContext } from '../auth/decorators/zoomContext.decorator';
@@ -22,10 +29,14 @@ export class PlaySessionsController {
     @ZoomContext() context: ZoomContext,
     @Query(new QueryParamsPipe()) filters: QueryParameters,
   ): Promise<[PlaySession[], number]> {
-    return await this.playSessionsService.getPlaySessionsResults(
-      filters,
-      context,
-    );
+    try {
+      return await this.playSessionsService.getPlaySessionsResults(
+        filters,
+        context,
+      );
+    } catch (e) {
+      throw new BadRequestException(e);
+    }
   }
 
   @ApiOperation({ summary: 'Get play sessions' })
@@ -34,7 +45,11 @@ export class PlaySessionsController {
   async getPlaySessions(
     @ZoomContext() context: ZoomContext,
   ): Promise<PlaySession[]> {
-    return await this.playSessionsService.getPlaySessions(context);
+    try {
+      return await this.playSessionsService.getPlaySessions(context);
+    } catch (e) {
+      throw new BadRequestException(e);
+    }
   }
 
   @ApiOperation({ summary: 'Get play sessions' })
@@ -43,6 +58,10 @@ export class PlaySessionsController {
   async getPlaySessionReport(
     @Param('playSessionId') playSessionId: string,
   ): Promise<Report> {
-    return await this.playSessionsService.getPlaySessionReport(playSessionId);
+    try {
+      return await this.playSessionsService.getPlaySessionReport(playSessionId);
+    } catch (e) {
+      throw new BadRequestException(e);
+    }
   }
 }

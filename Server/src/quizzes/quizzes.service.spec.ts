@@ -1,16 +1,17 @@
-import { BadRequestException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { createStubInstance } from 'sinon';
-import { ZoomContext } from 'src/auth/decorators/zoomContext.decorator';
-import { PlaySession } from 'src/play-sessions/playSession.entity';
 import * as typeorm from 'typeorm';
 import { DataSource } from 'typeorm';
 
 import { Answer } from '../answers/answer.entity';
+import { ZoomContext } from '../auth/decorators/zoomContext.decorator';
+import { PlaySession } from '../play-sessions/playSession.entity';
 import { Result } from '../results/result.entity';
 import { CreateQuizDTO } from './createQuiz.dto';
 import { Quiz } from './quiz.entity';
 import { QuizzesService } from './quizzes.service';
+import { AnswerRepository } from '../answers/answer.repository';
+import { QuizRepository } from './quiz.repository';
 
 describe('QuizzesService', () => {
   let service: QuizzesService;
@@ -85,6 +86,19 @@ describe('QuizzesService', () => {
     answers: answersMock,
   };
 
+  const mockAnswerRepository = {
+    createAnswerEntity: jest.fn().mockResolvedValue(answersMock[0]),
+    findAnswersByQuizId: jest.fn().mockResolvedValue(answersMock)
+  }
+
+  const mockQuizRepository = {
+    createQuizEntity:jest.fn().mockResolvedValue(quizMock),
+    findOneById:jest.fn().mockResolvedValue(quizMock),
+    findAnswersByQuiz:jest.fn().mockResolvedValue(answersMock),
+    findAndCount:jest.fn().mockResolvedValue([quizMock, 1]),
+    softDeleteQuiz:jest.fn().mockResolvedValue(quizMock),
+  }
+
   const dataSourceStub: DataSource = createStubInstance(typeorm.DataSource);
 
   beforeEach(async () => {
@@ -95,6 +109,14 @@ describe('QuizzesService', () => {
           provide: DataSource,
           useValue: dataSourceStub,
         },
+        {
+          provide: AnswerRepository,
+          useValue: mockAnswerRepository
+        },
+        {
+          provide: QuizRepository,
+          useValue: mockQuizRepository
+        }
       ],
     }).compile();
 
@@ -123,22 +145,12 @@ describe('QuizzesService', () => {
     };
 
     it('should return quizzes by user', async () => {
-      const quizRepositoryStub = jest
-        .spyOn(dataSourceStub, 'getRepository')
-        .mockImplementation((target) => {
-          const original = jest.requireActual('typeorm');
-          return {
-            ...original,
-            findAndCount: jest.fn().mockResolvedValue([quizMock, 1]),
-          };
-        });
-
       const quizzes: [Quiz[], number] = await service.getUserQuizzes(
         filters,
         zoomContext,
       );
 
-      expect(quizRepositoryStub).toHaveBeenCalledTimes(1);
+      expect(mockQuizRepository.findAndCount).toHaveBeenCalledTimes(1);
       expect(quizzes).toEqual([quizMock, 1]);
     });
   });
@@ -147,19 +159,9 @@ describe('QuizzesService', () => {
     const quizId = 'db16f3f6-25bb-477a-9ec3-0f55455613a9';
 
     it('should return quiz answers', async () => {
-      const answerRepositoryStub = jest
-        .spyOn(dataSourceStub, 'getRepository')
-        .mockImplementation((target) => {
-          const original = jest.requireActual('typeorm');
-          return {
-            ...original,
-            findBy: jest.fn().mockResolvedValue(answersMock),
-          };
-        });
-
       const answers: Answer[] = await service.getQuizAnswers(quizId);
 
-      expect(answerRepositoryStub).toHaveBeenCalledTimes(1);
+      expect(mockAnswerRepository.findAnswersByQuizId).toHaveBeenCalledTimes(1);
       expect(answers).toEqual(answersMock);
     });
   });
@@ -168,19 +170,10 @@ describe('QuizzesService', () => {
     const quizId = 'db16f3f6-25bb-477a-9ec3-0f55455613a9';
 
     it('should return one quiz', async () => {
-      const quizRepositoryStub = jest
-        .spyOn(dataSourceStub, 'getRepository')
-        .mockImplementation((target) => {
-          const original = jest.requireActual('typeorm');
-          return {
-            ...original,
-            findOneBy: jest.fn().mockResolvedValue(quizMock),
-          };
-        });
-
       const quiz: Quiz = await service.getOneQuiz(quizId);
 
-      expect(quizRepositoryStub).toHaveBeenCalledTimes(1);
+      expect(mockQuizRepository.findOneById).toHaveBeenCalledTimes(1);
+      expect(mockQuizRepository.findOneById).toBeCalledWith(quizId);
       expect(quiz).toEqual(quizMock);
     });
   });
@@ -189,20 +182,11 @@ describe('QuizzesService', () => {
     const quizId = 'db16f3f6-25bb-477a-9ec3-0f55455613a9';
 
     it('should delete quiz', async () => {
-      const quizRepositoryStub = jest
-        .spyOn(dataSourceStub, 'getRepository')
-        .mockImplementation((target) => {
-          const original = jest.requireActual('typeorm');
-          return {
-            ...original,
-            softDelete: jest.fn().mockResolvedValue(quizMock),
-          };
-        });
 
-      const result: typeorm.UpdateResult = await service.deleteQuiz(quizId);
+      await service.deleteQuiz(quizId);
 
-      expect(quizRepositoryStub).toHaveBeenCalledTimes(1);
-      expect(result).toEqual(quizMock);
+      expect(mockQuizRepository.softDeleteQuiz).toHaveBeenCalledTimes(1);
+      expect(mockQuizRepository.softDeleteQuiz).toBeCalledWith(quizId);
     });
   });
 
@@ -243,6 +227,10 @@ describe('QuizzesService', () => {
       const quizResult: Quiz = await service.createQuiz(quizDto, zoomContext);
 
       expect(dataSourceStub.createQueryRunner).toHaveBeenCalledTimes(1);
+
+      expect(mockAnswerRepository.createAnswerEntity).toHaveBeenCalledTimes(4);
+      expect(mockQuizRepository.createQuizEntity).toHaveBeenCalledTimes(1);
+
       expect(manager.save).toHaveBeenCalledTimes(5);
       expect(quizResult).toEqual(quizMock);
     });

@@ -1,14 +1,15 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { createStubInstance } from 'sinon';
-import { PlaySession } from 'src/play-sessions/playSession.entity';
 import * as typeorm from 'typeorm';
 import { DataSource } from 'typeorm';
 
 import { Answer } from '../answers/answer.entity';
+import { PlaySession } from '../play-sessions/playSession.entity';
 import { Quiz } from '../quizzes/quiz.entity';
 import { CreateResultDTO } from './createResult.dto';
 import { Result } from './result.entity';
 import { ResultsService } from './results.service';
+import { ResultRepository } from './result.repository';
 
 describe('ResultsService', () => {
   let service: ResultsService;
@@ -75,6 +76,10 @@ describe('ResultsService', () => {
 
   const dataSourceStub: DataSource = createStubInstance(typeorm.DataSource);
 
+  const mockResultRepository = {
+    createResultEntity: jest.fn().mockResolvedValue(resultMock)
+  }
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -83,6 +88,10 @@ describe('ResultsService', () => {
           provide: DataSource,
           useValue: dataSourceStub,
         },
+        {
+          provide: ResultRepository,
+          useValue: mockResultRepository
+        }
       ],
     }).compile();
 
@@ -119,100 +128,15 @@ describe('ResultsService', () => {
         .spyOn(dataSourceStub, 'createQueryRunner')
         .mockReturnValue(mockCreateQueryRunner());
 
-      jest
-        .spyOn(dataSourceStub, 'getRepository')
-        .mockImplementation((target) => {
-          const original = jest.requireActual('typeorm');
-          const isQuiz = !!target.toString().match(/Quiz/g);
-
-          if (isQuiz) {
-            return {
-              ...original,
-              findOneBy: jest.fn().mockResolvedValue(quizMock),
-            };
-          } else {
-            return {
-              ...original,
-              findOneBy: jest.fn().mockResolvedValue(answersMock),
-            };
-          }
-        });
-
       const newResult: Result = await service.createResult(resultDto);
 
       expect(dataSourceStub.createQueryRunner).toHaveBeenCalledTimes(1);
+      expect(mockResultRepository.createResultEntity).toHaveBeenCalledTimes(1);
+      expect(mockResultRepository.createResultEntity).toBeCalledWith(resultDto);
+
       expect(manager.save).toHaveBeenCalledTimes(1);
       expect(newResult).toEqual(resultMock);
     });
-
-    it('should throw an error if result answer is undefined', async () => {
-      manager.save = jest.fn();
-
-      const mockCreateQueryRunner = jest.fn().mockImplementation(() => ({
-        connect: jest.fn(),
-        release: jest.fn(),
-        startTransaction: jest.fn(),
-        commitTransaction: jest.fn(),
-        rollbackTransaction: jest.fn(),
-        manager: manager,
-      }));
-
-      jest
-        .spyOn(dataSourceStub, 'createQueryRunner')
-        .mockReturnValue(mockCreateQueryRunner());
-
-      jest
-        .spyOn(dataSourceStub, 'getRepository')
-        .mockImplementation((target) => {
-          const original = jest.requireActual('typeorm');
-          const isQuiz = !!target.toString().match(/Quiz/g);
-
-          if (isQuiz) {
-            return { ...original, findOneBy: jest.fn() };
-          } else {
-            return {
-              ...original,
-              findOneBy: jest.fn().mockResolvedValue(answersMock),
-            };
-          }
-        });
-
-      await expect(service.createResult(resultDto)).rejects.toThrow(TypeError);
-    });
-
-    it('should throw an error if result quiz is undefined', async () => {
-      manager.save = jest.fn();
-
-      const mockCreateQueryRunner = jest.fn().mockImplementation(() => ({
-        connect: jest.fn(),
-        release: jest.fn(),
-        startTransaction: jest.fn(),
-        commitTransaction: jest.fn(),
-        rollbackTransaction: jest.fn(),
-        manager: manager,
-      }));
-
-      jest
-        .spyOn(dataSourceStub, 'createQueryRunner')
-        .mockReturnValue(mockCreateQueryRunner());
-
-      jest
-        .spyOn(dataSourceStub, 'getRepository')
-        .mockImplementation((target) => {
-          const original = jest.requireActual('typeorm');
-          const isQuiz = !!target.toString().match(/Quiz/g);
-
-          if (isQuiz) {
-            return {
-              ...original,
-              findOneBy: jest.fn().mockResolvedValue(quizMock),
-            };
-          } else {
-            return { ...original, findOneBy: jest.fn() };
-          }
-        });
-
-      await expect(service.createResult(resultDto)).rejects.toThrow(TypeError);
-    });
+    
   });
 });

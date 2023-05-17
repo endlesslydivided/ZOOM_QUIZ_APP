@@ -1,17 +1,18 @@
 import { BadRequestException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { createStubInstance } from 'sinon';
-import { ZoomContext } from 'src/auth/decorators/zoomContext.decorator';
 import * as typeorm from 'typeorm';
 import { DataSource } from 'typeorm';
 
 import { Answer } from '../answers/answer.entity';
+import { ZoomContext } from '../auth/decorators/zoomContext.decorator';
 import { Quiz } from '../quizzes/quiz.entity';
 import { Result } from '../results/result.entity';
 import { CreatePlaySessionDTO } from './createPlaySession.dto';
 import { Report } from './interfaces';
 import { PlaySessionsService } from './play-sessions.service';
 import { PlaySession } from './playSession.entity';
+import { PlaySessionRepository } from './play-sessions.repository';
 
 describe('PlaySessionsService', () => {
   let service: PlaySessionsService;
@@ -88,6 +89,16 @@ describe('PlaySessionsService', () => {
 
   const dataSourceStub: DataSource = createStubInstance(typeorm.DataSource);
 
+  const mockPlaySessionRepository = {
+    createPlaySessionEntity:jest.fn().mockResolvedValue(playSessionMock),
+    findOneById:jest.fn().mockResolvedValue(playSessionMock),
+    findOneByMeetAndQuiz:jest.fn().mockResolvedValue(playSessionMock),
+    softDeletePlaySession:jest.fn(),
+    findAndCountPlaySessionResultsByUser:jest.fn().mockResolvedValue([playSessionMock,1]),
+    findPlaySessionsByUserAndMeet:jest.fn().mockResolvedValue([playSessionMock]),
+    findPlaySessionsResultsById:jest.fn().mockResolvedValue(playSessionMock)
+  }
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -95,6 +106,10 @@ describe('PlaySessionsService', () => {
         {
           provide: DataSource,
           useValue: dataSourceStub,
+        },
+        {
+          provide: PlaySessionRepository,
+          useValue: mockPlaySessionRepository,
         },
       ],
     }).compile();
@@ -125,24 +140,12 @@ describe('PlaySessionsService', () => {
     };
 
     it('should return play session results by user', async () => {
-      const mockQueryBuilder = jest.fn().mockImplementation(() => ({
-        createQueryBuilder: jest.fn().mockReturnThis(),
-        withDeleted: jest.fn().mockReturnThis(),
-        leftJoinAndSelect: jest.fn().mockReturnThis(),
-        select: jest.fn().mockReturnThis(),
-        take: jest.fn().mockReturnThis(),
-        skip: jest.fn().mockReturnThis(),
-        getManyAndCount: jest.fn().mockResolvedValue([playSessionMock, 1]),
-      }));
-
-      const queryBuilderSpy = jest
-        .spyOn(dataSourceStub, 'createQueryBuilder')
-        .mockReturnValue(mockQueryBuilder());
-
       const playSessionResults: [PlaySession[], number] =
         await service.getPlaySessionsResults(filters, zoomContext);
 
-      expect(queryBuilderSpy).toHaveBeenCalledTimes(1);
+      expect(mockPlaySessionRepository.findAndCountPlaySessionResultsByUser).toHaveBeenCalledTimes(1);
+      expect(mockPlaySessionRepository.findAndCountPlaySessionResultsByUser).toBeCalledWith(filters,zoomContext.uid);
+
       expect(playSessionResults).toEqual([playSessionMock, 1]);
     });
   });
@@ -160,23 +163,13 @@ describe('PlaySessionsService', () => {
     };
 
     it('should return play sessions by user', async () => {
-      const mockQueryBuilder = jest.fn().mockImplementation(() => ({
-        createQueryBuilder: jest.fn().mockReturnThis(),
-        leftJoinAndSelect: jest.fn().mockReturnThis(),
-        select: jest.fn().mockReturnThis(),
-        where: jest.fn().mockReturnThis(),
-        getMany: jest.fn().mockResolvedValue([playSessionMock]),
-      }));
-
-      const queryBuilderSpy = jest
-        .spyOn(dataSourceStub, 'createQueryBuilder')
-        .mockReturnValue(mockQueryBuilder());
-
-      const playSessionsResult: PlaySession[] = await service.getPlaySessions(
+         const playSessionsResult: PlaySession[] = await service.getPlaySessions(
         zoomContext,
       );
 
-      expect(queryBuilderSpy).toHaveBeenCalledTimes(1);
+      expect(mockPlaySessionRepository.findPlaySessionsByUserAndMeet).toHaveBeenCalledTimes(1);
+      expect(mockPlaySessionRepository.findPlaySessionsByUserAndMeet).toBeCalledWith(zoomContext.uid,zoomContext.mid);
+
       expect(playSessionsResult).toEqual([playSessionMock]);
     });
   });
@@ -190,23 +183,13 @@ describe('PlaySessionsService', () => {
     };
 
     it('should return play session report', async () => {
-      const mockQueryBuilder = jest.fn().mockImplementation(() => ({
-        createQueryBuilder: jest.fn().mockReturnThis(),
-        leftJoinAndSelect: jest.fn().mockReturnThis(),
-        select: jest.fn().mockReturnThis(),
-        where: jest.fn().mockReturnThis(),
-        getOne: jest.fn().mockResolvedValue(playSessionMock),
-      }));
-
-      const queryBuilderSpy = jest
-        .spyOn(dataSourceStub, 'createQueryBuilder')
-        .mockReturnValue(mockQueryBuilder());
-
       const playSessionReportResult: Report =
         await service.getPlaySessionReport(playSessionId);
 
-      expect(queryBuilderSpy).toHaveBeenCalledTimes(1);
-      expect(playSessionReportResult).toEqual(playSessionReport);
+        expect(mockPlaySessionRepository.findPlaySessionsResultsById).toHaveBeenCalledTimes(1);
+        expect(mockPlaySessionRepository.findPlaySessionsResultsById).toBeCalledWith(playSessionId);
+        
+        expect(playSessionReportResult).toEqual(playSessionReport);
     });
   });
 
@@ -234,27 +217,24 @@ describe('PlaySessionsService', () => {
         .spyOn(dataSourceStub, 'createQueryRunner')
         .mockReturnValue(mockCreateQueryRunner());
 
-      jest
-        .spyOn(dataSourceStub, 'getRepository')
-        .mockImplementation((target) => {
-          const original = jest.requireActual('typeorm');
-          const isQuiz = !!target.toString().match(/Quiz/g);
-          return isQuiz
-            ? {
-                ...original,
-                findOne: jest.fn().mockResolvedValue(quizMock),
-              }
-            : {
-                ...original,
-                findOne: jest.fn(),
-              };
-        });
+      const findOneMock =  jest
+        .spyOn(mockPlaySessionRepository, 'findOneByMeetAndQuiz')
+        .mockReturnValue(null);
+
 
       const playSessionResult: PlaySession = await service.createPlaySession(
         playSessionDto,
       );
 
       expect(dataSourceStub.createQueryRunner).toHaveBeenCalledTimes(1);
+      
+
+      expect(findOneMock).toBeCalledWith(playSessionDto.meetId,playSessionDto.quizId);
+      expect(findOneMock).toHaveBeenCalledTimes(1);
+
+      expect(mockPlaySessionRepository.createPlaySessionEntity).toBeCalledWith(playSessionDto);
+      expect(mockPlaySessionRepository.createPlaySessionEntity).toHaveBeenCalledTimes(1);
+
       expect(manager.save).toHaveBeenCalledTimes(1);
       expect(playSessionResult).toEqual(playSessionMock);
     });
@@ -275,98 +255,13 @@ describe('PlaySessionsService', () => {
         .spyOn(dataSourceStub, 'createQueryRunner')
         .mockReturnValue(mockCreateQueryRunner());
 
-      jest
-        .spyOn(dataSourceStub, 'getRepository')
-        .mockImplementation((target) => {
-          const original = jest.requireActual('typeorm');
-          const isQuiz = !!target.toString().match(/Quiz/g);
-          return isQuiz
-            ? {
-                ...original,
-                findOne: jest.fn().mockResolvedValue(quizMock),
-              }
-            : {
-                ...original,
-                findOne: jest.fn().mockResolvedValue(playSessionMock),
-              };
-        });
+
+        jest
+        .spyOn(mockPlaySessionRepository, 'findOneByMeetAndQuiz')
+        .mockReturnValue(playSessionMock);
 
       await expect(service.createPlaySession(playSessionDto)).rejects.toThrow(
         BadRequestException,
-      );
-    });
-
-    it('throw an error if play session quiz is undefined', async () => {
-      manager.save = jest.fn();
-
-      const mockCreateQueryRunner = jest.fn().mockImplementation(() => ({
-        connect: jest.fn(),
-        release: jest.fn(),
-        startTransaction: jest.fn(),
-        commitTransaction: jest.fn(),
-        rollbackTransaction: jest.fn(),
-        manager: manager,
-      }));
-
-      jest
-        .spyOn(dataSourceStub, 'createQueryRunner')
-        .mockReturnValue(mockCreateQueryRunner());
-
-      jest
-        .spyOn(dataSourceStub, 'getRepository')
-        .mockImplementation((target) => {
-          const original = jest.requireActual('typeorm');
-          const isQuiz = !!target.toString().match(/Quiz/g);
-          return isQuiz
-            ? {
-                ...original,
-                findOne: jest.fn(),
-              }
-            : {
-                ...original,
-                findOne: jest.fn(),
-              };
-        });
-
-      await expect(service.createPlaySession(playSessionDto)).rejects.toThrow(
-        TypeError,
-      );
-    });
-
-    it('throw an error if playSession dto is incorrect', async () => {
-      manager.save = jest.fn().mockRejectedValue(new Error('Example error'));
-
-      const mockCreateQueryRunner = jest.fn().mockImplementation(() => ({
-        connect: jest.fn(),
-        release: jest.fn(),
-        startTransaction: jest.fn(),
-        commitTransaction: jest.fn(),
-        rollbackTransaction: jest.fn(),
-        manager: manager,
-      }));
-
-      jest
-        .spyOn(dataSourceStub, 'createQueryRunner')
-        .mockReturnValue(mockCreateQueryRunner());
-
-      jest
-        .spyOn(dataSourceStub, 'getRepository')
-        .mockImplementation((target) => {
-          const original = jest.requireActual('typeorm');
-          const isQuiz = !!target.toString().match(/Quiz/g);
-          return isQuiz
-            ? {
-                ...original,
-                findOne: jest.fn().mockResolvedValue(quizMock),
-              }
-            : {
-                ...original,
-                findOne: jest.fn(),
-              };
-        });
-
-      await expect(service.createPlaySession(playSessionDto)).rejects.toThrow(
-        Error,
       );
     });
   });

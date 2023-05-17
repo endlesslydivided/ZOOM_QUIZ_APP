@@ -1,9 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { BaseEntity } from 'src/share/entity/base.entity';
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 
 import { Quiz } from '../quizzes/quiz.entity';
 import { Result } from '../results/result.entity';
+import { BaseEntity } from '../share/entity/base.entity';
 
 @Entity({ name: 'answer' })
 export class Answer extends BaseEntity {
