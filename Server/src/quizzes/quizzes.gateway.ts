@@ -22,6 +22,7 @@ import { Result } from '../results/result.entity';
 import { ResultsService } from '../results/results.service';
 import { getAppContext } from '../share/utils/cipher';
 import { QuizzesService } from './quizzes.service';
+import { ConfigService } from '@nestjs/config';
 
 export enum QuizClientEvent {
   SERVER_SENDS_ANSWERS = 'SERVER_SENDS_ANSWER',
@@ -59,6 +60,7 @@ export class QuizGateway
     private playSessionsService: PlaySessionsService,
     @Inject(ResultsService)
     private resultsService: ResultsService,
+    private configService: ConfigService
   ) {}
 
   @WebSocketServer()
@@ -72,7 +74,7 @@ export class QuizGateway
   ): Promise<void> {
     const zoomContext: ZoomContext =
       client.handshake.auth.context &&
-      getAppContext(client.handshake.auth.context);
+      getAppContext(client.handshake.auth.context,this.configService.get<string>('ZM_CLIENT_SECRET'));
 
     const playSessionQuiz: PlaySession =
       await this.playSessionsService.createPlaySession({
@@ -92,7 +94,7 @@ export class QuizGateway
   ): Promise<void> {
     const zoomContext: ZoomContext =
       client.handshake.auth.context &&
-      getAppContext(client.handshake.auth.context);
+      getAppContext(client.handshake.auth.context,this.configService.get<string>('ZM_CLIENT_SECRET'));
 
     const result: Result = await this.resultsService.createResult({
       ...body.result,
@@ -122,7 +124,7 @@ export class QuizGateway
     const zoomContext: ZoomContext =
       auth.context &&
       auth.context !== 'undefined' &&
-      getAppContext(auth.context);
+      getAppContext(auth.context,this.configService.get<string>('ZM_CLIENT_SECRET'));
 
     if (zoomContext.mid && zoomContext.uid) {
       client.join(zoomContext.mid);

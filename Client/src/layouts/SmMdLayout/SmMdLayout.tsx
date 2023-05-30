@@ -6,16 +6,15 @@ import {
     TrophyOutlined,
 } from '@ant-design/icons';
 import { Image, Layout, Menu, MenuProps, Typography } from 'antd';
+import { ZoomContextString } from 'entities/zoomContext';
+import { AppRoutes } from 'pages';
 import React from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
+import { RootState } from 'shared/api/store';
+import { useAppSelector } from 'shared/hooks/redux';
 
 //@ts-expect-error
-import logo from '../../../assets/logo/logo.png';
-import { useAppSelector } from '../../hooks/redux';
-import { RootState } from '../../store/store';
-import { ZoomContext, ZoomContextString } from '../../types/storeSliceTypes';
-import { AppRoutes } from '../../utils/routeConsts';
-
+import logo from './_mocks_/logo.png';
 
 const { Header, Content } = Layout;
 
@@ -32,7 +31,9 @@ export default function SmMdLayout() {
         {
             label: (
                 <Typography.Text strong type='secondary'>
-                    <NavLink to={`../${AppRoutes.QUIZZES_ROUTE}?context=${zoomContext}`}>
+                    <NavLink
+                        to={`../${AppRoutes.QUIZZES_ROUTE}?context=${zoomContext}`}
+                    >
                         Your quizzes
                     </NavLink>
                 </Typography.Text>
@@ -43,7 +44,9 @@ export default function SmMdLayout() {
         {
             label: (
                 <Typography.Text strong type='secondary'>
-                    <NavLink to={`../${AppRoutes.ANSWER_ROUTE}?context=${zoomContext}`}>
+                    <NavLink
+                        to={`../${AppRoutes.ANSWER_ROUTE}?context=${zoomContext}`}
+                    >
                         Answer!
                     </NavLink>
                 </Typography.Text>
@@ -54,11 +57,13 @@ export default function SmMdLayout() {
         {
             label: (
                 <Typography.Text strong type='secondary'>
-                    <NavLink to={`../${AppRoutes.RESULTS_ROUTE}?context=${zoomContext}`}>
+                    <NavLink
+                        to={`../${AppRoutes.RESULTS_ROUTE}?context=${zoomContext}`}
+                    >
                         Results
                     </NavLink>
                 </Typography.Text>
-            ),        
+            ),
             icon: <TrophyOutlined />,
             key: AppRoutes.RESULTS_ROUTE,
         },

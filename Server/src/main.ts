@@ -13,11 +13,15 @@ import { URL } from 'url';
 import { AppModule } from './app.module';
 import { AllExceptionFilter } from './share/exception/AllException.filter';
 import { ValidationExceptionFactory } from './share/validation/validation.exceptionFactory';
+import { ConfigService } from '@nestjs/config';
 
 const bootstrap = async (): Promise<void> => {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
     rawBody: true,
   });
+
+  const configService = app.get(ConfigService);
+
 
   const viewDir = `${__dirname}/server/views`;
 
@@ -29,17 +33,18 @@ const bootstrap = async (): Promise<void> => {
     optionsSuccessStatus: 204,
   });
 
+
   app.set('view engine', 'pug');
   app.set('views', viewDir);
 
-  const appName = process.env.APP_NAME;
+  const appName = configService.get<string>('APP_NAME');
 
-  const redirectHost: string = new URL(process.env.ZM_REDIRECT_URL).host;
+  const redirectHost: string = new URL(configService.get<string>('ZM_REDIRECT_URL')).host;
   const logFunc = (
     r: InternalAxiosRequestConfig & AxiosResponse,
   ): InternalAxiosRequestConfig & AxiosResponse => {
-    if (process.env.NODE_ENV !== 'production') {
-      const { method, status, url, baseURL, config } = r;
+    if (configService.get<string>('NODE_ENV') !== 'production') {
+      const { method, status, url, config } = r;
 
       const endp = url || config?.url;
       let str = endp;
@@ -55,6 +60,7 @@ const bootstrap = async (): Promise<void> => {
 
   axios.interceptors.request.use(logFunc);
   axios.interceptors.response.use(logFunc);
+
 
   app.use(
     helmet({
@@ -80,19 +86,20 @@ const bootstrap = async (): Promise<void> => {
     }),
   );
 
+
   app.useBodyParser('json', { limit: '10mb' });
   app.use(compression());
   app.use(cookieParser());
 
   app.use(
     session({
-      secret: [process.env.SESSION_SECRET],
+      secret: [configService.get<string>('SESSION_SECRET')],
       resave: false,
       saveUninitialized: false,
       cookie: {
         maxAge: 24 * 60 * 60 * 1000,
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
+        secure: configService.get<string>('NODE_ENV') === 'production',
       },
     }),
   );
@@ -122,6 +129,6 @@ const bootstrap = async (): Promise<void> => {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
 
-  await app.listen(process.env.PORT || 3001);
+  await app.listen(configService.get<string>('PORT') || 3001);
 };
 bootstrap();

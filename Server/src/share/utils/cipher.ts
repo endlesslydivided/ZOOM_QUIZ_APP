@@ -3,7 +3,7 @@ import createError from 'http-errors';
 import { ZoomContext } from '../../auth/decorators/zoomContext.decorator';
 
 
-const unpack = (ctx: string): Record<string, Buffer> => {
+const unpack = (ctx: string) => {
   let buf = Buffer.from(ctx, 'base64');
 
   const ivLength = buf.readUInt8();
@@ -34,7 +34,7 @@ const unpack = (ctx: string): Record<string, Buffer> => {
 };
 
 const decrypt = (
-  cipherText: string,
+  cipherText: any,
   hash: crypto.CipherKey,
   iv: crypto.BinaryLike,
   aad: Buffer,
@@ -58,13 +58,13 @@ export const getAppContext = (header: string, secret = ''): ZoomContext => {
   if (!header || typeof header !== 'string')
     throw createError(500, 'context header must be a valid string');
 
-  const key = secret || process.env.ZM_CLIENT_SECRET;
+  const key = secret;
 
   const { iv, aad, cipherText, tag } = unpack(header);
 
   const hash = crypto.createHash('sha256').update(key).digest();
 
-  return decrypt(cipherText.toString(), hash, iv, aad, tag);
+  return decrypt(cipherText, hash, iv, aad, tag);
 };
 
 export const contextHeader = 'x-zoom-app-context';

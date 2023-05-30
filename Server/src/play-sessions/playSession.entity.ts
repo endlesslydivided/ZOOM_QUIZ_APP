@@ -27,3 +27,4 @@ export class PlaySession extends BaseModelEntity {
   })
   results: Result[];
 }
+

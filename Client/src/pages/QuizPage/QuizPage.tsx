@@ -1,9 +1,7 @@
 import './QuizPage.scss';
 
 import { Col, Row } from 'antd';
-import React from 'react';
-
-import QuizList from '../../components/QuizList/QuizList';
+import { QuizList } from 'widgets/Lists/QuizList';
 
 const QuizPage = () => {
     return (

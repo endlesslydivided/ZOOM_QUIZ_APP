@@ -1,1 +1,1 @@
-export const host: URL = new URL(process.env.ZM_HOST || 'https://zoom.us');
+export const host:string = 'https://zoom.us';

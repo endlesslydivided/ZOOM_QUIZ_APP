@@ -8,14 +8,15 @@ import { Session as ExpressSession } from 'express-session';
 import { URL } from 'url';
 
 import { host as ZoomHost } from '../share/consts/variables.consts';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AuthService {
   private baseURL: string;
   private host: URL;
 
-  constructor() {
-    this.host = ZoomHost;
+  constructor(private readonly configService: ConfigService) {
+    this.host = new URL(configService.get('ZM_HOST') || ZoomHost);
     this.host.hostname = `api.${this.host.hostname}`;
     this.baseURL = this.host.href;
   }
@@ -25,8 +26,8 @@ export class AuthService {
     id = '',
     secret = '',
   ): Promise<Record<string, string>> {
-    const username = id || process.env.ZM_CLIENT_ID;
-    const password = secret || process.env.ZM_CLIENT_SECRET;
+    const username = id || this.configService.get<string>('ZM_CLIENT_ID');
+    const password = secret || this.configService.get<string>('ZM_CLIENT_SECRET');
 
     return axios({
       data: new URLSearchParams(params).toString(),
@@ -94,7 +95,7 @@ export class AuthService {
     return this.tokenRequest({
       code,
       code_verifier: verifier,
-      redirect_uri: process.env.ZM_REDIRECT_URL,
+      redirect_uri: this.configService.get<string>('ZM_REDIRECT_URL'),
       grant_type: 'authorization_code',
       code_challenge_method,
     });

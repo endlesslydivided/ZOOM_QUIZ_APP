@@ -7,6 +7,7 @@ import axios from 'axios';
 import { Session } from 'express-session';
 
 import { AuthService } from './auth.service';
+import { ConfigService } from '@nestjs/config';
 
 jest.mock('axios');
 
@@ -52,7 +53,18 @@ describe('AuthService', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [AuthService],
+      providers: [AuthService, {
+        provide: ConfigService,
+        useValue: {
+          get(key:string)
+          {
+            if(key === "ZM_HOST")
+            {
+              return process.env.ZM_HOST;
+            }
+          }
+        },
+      },],
     }).compile();
 
     service = module.get<AuthService>(AuthService);

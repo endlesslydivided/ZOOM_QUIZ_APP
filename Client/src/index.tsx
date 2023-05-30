@@ -1,18 +1,13 @@
-import './index.css';
+import './app/index.scss';
 
-import ReactDOM from 'react-dom/client';
 import { Provider } from 'react-redux';
 import { BrowserRouter } from 'react-router-dom';
+import { store } from 'shared/api/store';
+import { createRoot } from 'react-dom/client';
 
-import App from './App';
-import { store } from './store/store';
+import App from './app/App';
 
-
-const root = ReactDOM.createRoot(
-    document.getElementById('root') as HTMLElement
-);
-
-const RootElement = () => {
+const AppContainer = () => {
     return (
         <Provider store={store}>
             <div className='area'>
@@ -30,10 +25,11 @@ const RootElement = () => {
                 </ul>
             </div>
             <BrowserRouter>
-                <App />
+                <App />;
             </BrowserRouter>
         </Provider>
     );
 };
 
-root.render(<RootElement />);
+const root = createRoot(document.getElementById('root') as HTMLElement);
+root.render(<AppContainer />);
