@@ -1,38 +1,38 @@
 import { Controller, Get, Req, Res, Session } from '@nestjs/common';
-import { AppService } from './app.service';
 import { Request, Response } from 'express';
-import { contextHeader, getAppContext } from './utils/cipher.js';
-import { Session as ExpressSession} from 'express-session';
+import { Session as ExpressSession } from 'express-session';
+
+import { AppService } from './app.service';
+import { ZoomContext } from './auth/decorators/zoomContext.decorator';
+import { contextHeader } from './share/utils/cipher.js';
+import { ConfigService } from '@nestjs/config';
 
 @Controller()
 export class AppController {
-  constructor(private readonly appService: AppService) {}
+  constructor(private readonly appService: AppService,
+    private configService: ConfigService) {}
 
   @Get()
-  async homeRoute(@Req() req:Request,@Res() res:Response): Promise<void> {
-    try
-      {
-      const header = req.header(contextHeader);
+  async homeRoute(@Req() req: Request, @Res() res: Response): Promise<void> {
+    const context: string = req.header(contextHeader);
+    res.redirect(this.configService.get<string>('REACT_APP_URI') + `?context=${context}`);
+  }
 
-      const isZoom = header && getAppContext(header);
-      const name = isZoom ? 'Zoom' : 'Browser';
-
-      return res.render('index', {isZoom,title: `Hello ${name}`});
-    } 
-    catch (e) 
-    {
-        throw e;
-    }
+  @Get('/context')
+  async contextRoute(
+    @ZoomContext() zoomContext: ZoomContext,
+  ): Promise<ZoomContext> {
+    return zoomContext;
   }
 
   @Get('/install')
-  async installRoute(@Res() res:Response,@Session() session:ExpressSession & {state:any,verifier:any}): Promise<void>
-  {
+  async installRoute(
+    @Res() res: Response,
+    @Session() session: ExpressSession & { state: string; verifier: string },
+  ): Promise<void> {
     const { url, state, verifier } = await this.appService.getInstallURL();
     session.state = state;
     session.verifier = verifier;
     res.redirect(url.href);
   }
-
-
 }
